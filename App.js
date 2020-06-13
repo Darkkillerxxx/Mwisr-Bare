@@ -1,14 +1,22 @@
 import * as React from 'react';
 import { Platform, StyleSheet, Text, View, Button } from 'react-native';
 import MainLayout from './Components/MainLayout'
-const instructions = Platform.select({
-  ios: `Press Cmd+R to reload,\nCmd+D or shake for dev menu`,
-  android: `Double tap R on your keyboard to reload,\nShake or press menu button for dev menu`,
-});
+import {createStore,combineReducers} from 'redux';
+import {Provider} from 'react-redux'
+import loginReducer from './store/Reducers/login'
+
+const rootReducer=combineReducers({
+  login:loginReducer
+})
+
+const store=createStore(rootReducer)
+
 
 export default function App() {
   return (
-    <MainLayout />
+    <Provider store={store}>
+        <MainLayout />
+    </Provider>
   );
 }
 
