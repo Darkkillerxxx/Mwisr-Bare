@@ -1,11 +1,14 @@
 import React,{component} from 'react';
-import { StyleSheet, Text,Button,View,Image,TouchableOpacity,ScrollView } from 'react-native';
+import { StyleSheet,Text,Button,View,Image,TouchableOpacity,ScrollView,ActivityIndicator } from 'react-native';
 import {RegisterContactDetails} from '../../Utils/api'
 import Container from '../../Components/Container'
 import Card from '../../Components/Card'
 import BoldText from '../../Components/BoldText'
 import NormalText from '../../Components/NormalText'
 import { TextInput } from 'react-native-gesture-handler';
+import CustomButton from '../../Components/Button'
+import {CommonStyle} from '../../CommonStyle/CommonStyle'
+
 class ContactDetails extends React.Component{
     constructor()
     {
@@ -96,42 +99,47 @@ class ContactDetails extends React.Component{
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>(*) Company</NormalText>
                         {this.state.ErrorCode === 1 ? <NormalText style={styles.ErrorText}>Company Cannot Be Left Blank</NormalText>:null}
-                        <TextInput placeholder="Enter Company Name" onChangeText={(e)=>this.setState({CompanyName:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Company Name" onChangeText={(e)=>this.setState({CompanyName:e})} style={CommonStyle.TextInputs}></TextInput>
 
                         <NormalText style={styles.OverideNormalText}>(*) Support Email</NormalText>
                         {this.state.ErrorCode === 2 ? <NormalText style={styles.ErrorText}>Email Should Be Valid</NormalText>:null}
-                        <TextInput placeholder="Enter Support Email" onChangeText={(e)=>this.setState({SupportEmail:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Support Email" onChangeText={(e)=>this.setState({SupportEmail:e})} style={CommonStyle.TextInputs}></TextInput>
 
                         <NormalText style={styles.OverideNormalText}>(*) Address</NormalText>
                         {this.state.ErrorCode === 3 ? <NormalText style={styles.ErrorText}>Address Cannot Be Left Blank</NormalText>:null}
-                        <TextInput placeholder="Enter Address" onChangeText={(e)=>this.setState({Address:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Address" onChangeText={(e)=>this.setState({Address:e})} style={CommonStyle.TextInputs}></TextInput>
                         
                         <NormalText style={styles.OverideNormalText}>(*) Support Contact 1</NormalText>
                         {this.state.ErrorCode === 4 ? <NormalText style={styles.ErrorText}>Support Contact Should Be Valid</NormalText>:null}
-                        <TextInput placeholder="Enter Support Contact 1" onChangeText={(e)=>this.setState({SupportContact1:e})} keyboardType='number-pad' style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Support Contact 1" onChangeText={(e)=>this.setState({SupportContact1:e})} keyboardType='number-pad' style={CommonStyle.TextInputs}></TextInput>
                         
                         <NormalText style={styles.OverideNormalText}>Support Contact 2</NormalText>
-                        <TextInput placeholder="Enter Support Contact 2" onChangeText={(e)=>this.setState({SupportContact2:e})} keyboardType='number-pad' style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Support Contact 2" onChangeText={(e)=>this.setState({SupportContact2:e})} keyboardType='number-pad' style={CommonStyle.TextInputs}></TextInput>
                         
                         <NormalText style={styles.OverideNormalText}>Website</NormalText>
-                        <TextInput placeholder="Enter Website" onChangeText={(e)=>this.setState({Website:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Website" onChangeText={(e)=>this.setState({Website:e})} style={CommonStyle.TextInputs}></TextInput>
 
                         <NormalText style={styles.OverideNormalText}>Main Broker Name</NormalText>
-                        <TextInput placeholder="Enter Broker Name" onChangeText={(e)=>this.setState({MainBrokerName:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Broker Name" onChangeText={(e)=>this.setState({MainBrokerName:e})} style={CommonStyle.TextInputs}></TextInput>
 
                         <NormalText style={styles.OverideNormalText}>Main Broker Contact</NormalText>
-                        <TextInput placeholder="Enter Broker Contact" onChangeText={(e)=>this.setState({MainBrokerContact:e})} keyboardType='number-pad' style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Broker Contact" onChangeText={(e)=>this.setState({MainBrokerContact:e})} keyboardType='number-pad' style={CommonStyle.TextInputs}></TextInput>
 
                         <NormalText style={styles.OverideNormalText}>Main Broker Email ID</NormalText>
-                        <TextInput placeholder="Enter Broker Website" onChangeText={(e)=>this.setState({MainBrokerEmailId:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Broker Website" onChangeText={(e)=>this.setState({MainBrokerEmailId:e})} style={CommonStyle.TextInputs}></TextInput>
 
                         <NormalText style={styles.OverideNormalText}>Main Broker Website</NormalText>
-                        <TextInput placeholder="Enter Broker Website" onChangeText={(e)=>this.setState({MainBrokerWebsite:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Broker Website" onChangeText={(e)=>this.setState({MainBrokerWebsite:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
-                    <View style={styles.ButtonContainer}>
-                        <Button title="Proceed" onPress={()=>this.onContactDetailsSubmit()} color="#f5bb18" />
-                    </View>
+                    <TouchableOpacity style={{width:'100%',alignItems:'center',marginBottom:10}} onPress={()=>this.onContactDetailsSubmit()}>
+                        <CustomButton>
+                            {!this.state.isLoading ? 
+                            <NormalText style={{color:'white',marginBottom:0}}>SUBMIT DETAILS</NormalText>:
+                            <ActivityIndicator size="small" color="#fff" />}
+                        </CustomButton>
+                    </TouchableOpacity>
+
                 </Card>    
             </Container>
            
