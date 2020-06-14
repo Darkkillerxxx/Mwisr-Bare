@@ -15,7 +15,8 @@ const NormalText = (props) => {
 const styles=StyleSheet.create({
     NormalText:{
         marginBottom:10,
-        fontSize:12
+        fontSize:12,
+        fontFamily:'open-sans'
     }
 })
 

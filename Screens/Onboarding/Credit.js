@@ -5,6 +5,8 @@ import Container from '../../Components/Container'
 import Card from '../../Components/Card'
 import BoldText from '../../Components/BoldText'
 import NormalText from '../../Components/NormalText'
+import CustomButton from '../../Components/Button'
+
 class Credit extends React.Component{
     constructor()
     {
@@ -274,7 +276,7 @@ const style=StyleSheet.create({
     },
     ButtonContainer:{
         width:'50%',
-        borderRadius:30,
+        borderRadius:10,
         overflow:'hidden',
         marginVertical:10
     }

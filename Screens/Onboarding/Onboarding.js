@@ -138,6 +138,9 @@ class OnBoarding extends React.Component{
             case 7 :
                 return Questions
                 break
+            case 8:
+                return Indie
+                break;
             default:
                 return label2
                 break

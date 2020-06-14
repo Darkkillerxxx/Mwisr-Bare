@@ -1,11 +1,14 @@
 import React,{component} from 'react';
-import { StyleSheet,TextInput,Text,Button,View,Image,ScrollView,Picker } from 'react-native';
+import { StyleSheet,TextInput,Text,Button,View,Image,ScrollView,Picker,TouchableOpacity,ActivityIndicator } from 'react-native';
 import {RegisterCompanyDetails} from '../../Utils/api'
 import {Checkbox} from 'react-native-paper'
 import Container from '../../Components/Container'
 import Card from '../../Components/Card'
 import BoldText from '../../Components/BoldText'
 import NormalText from '../../Components/NormalText'
+import CustomButton from '../../Components/Button'
+import {CommonStyle} from '../../CommonStyle/CommonStyle'
+
 
 
 class CompanyDetails extends React.Component{
@@ -62,13 +65,13 @@ class CompanyDetails extends React.Component{
                         </Picker>
 
                         <NormalText style={styles.OverideNormalText}>Years Of Experience</NormalText>
-                        <TextInput placeholder="Enter Years Of Experience" onChangeText={(e)=>this.setState({YearsOfExperience:parseInt(e)})} keyboardType="number-pad" style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Years Of Experience" onChangeText={(e)=>this.setState({YearsOfExperience:parseInt(e)})} keyboardType="number-pad" style={CommonStyle.TextInputs}></TextInput>
 
                         <NormalText style={styles.OverideNormalText}>Company name</NormalText>
-                        <TextInput placeholder="Enter Company Name" onChangeText={(e)=>this.setState({CompanyName:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Company Name" onChangeText={(e)=>this.setState({CompanyName:e})} style={CommonStyle.TextInputs}></TextInput>
 
                         <NormalText style={styles.OverideNormalText}>Designation</NormalText>
-                        <TextInput placeholder="Enter Designamtion" onChangeText={(e)=>this.setState({Designation:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Designamtion" onChangeText={(e)=>this.setState({Designation:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.CheckboxContainer}>
@@ -79,9 +82,13 @@ class CompanyDetails extends React.Component{
                     <NormalText style={styles.OverideNormalText}>Show Profile on WealthyFox</NormalText>
                     </View>
 
-                    <View style={styles.ButtonContainer}>
-                        <Button title="Proceed" onPress={()=>this.onCompanyDetailsSubmit()} color="#f5bb18" />
-                    </View>
+                    <TouchableOpacity style={{width:'100%',alignItems:'center',marginBottom:10}} onPress={()=>this.onCompanyDetailsSubmit()}>
+                        <CustomButton>
+                            {!this.state.IsLoading ? 
+                            <NormalText style={{color:'white',marginBottom:0}}>SUBMIT DETAILS</NormalText>:
+                            <ActivityIndicator size="small" color="#fff" />}
+                        </CustomButton>
+                    </TouchableOpacity>
                 </Card>    
             </View>
         )

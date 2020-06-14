@@ -138,7 +138,7 @@ onRegister=()=>{
               <TextInput placeholder="Confirm Password" onChangeText={(e)=>this.setState({ConfirmPassword:e})} secureTextEntry={true} style={CommonStyle.TextInputs}/>
 
 
-              <TouchableOpacity style={{width:'100%',alignItems:'center',marginBottom:10}} onPress={()=>this.onRegister()}>
+                 <TouchableOpacity style={{width:'100%',alignItems:'center',marginBottom:10}} onPress={()=>this.onRegister()}>
                     <CustomButton>
                         {!this.state.isLoading ? 
                         <NormalText style={{color:'white',marginBottom:0}}>CREATE ACCOUNT</NormalText>:

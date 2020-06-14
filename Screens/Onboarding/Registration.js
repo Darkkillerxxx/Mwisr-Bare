@@ -1,5 +1,5 @@
 import React,{component} from 'react';
-import { StyleSheet,TextInput,Button,View,ScrollView } from 'react-native';
+import { StyleSheet,TextInput,Button,View,ScrollView,TouchableOpacity,ActivityIndicator } from 'react-native';
 import {RegisterRegitrationDetails} from '../../Utils/api'
 import Container from '../../Components/Container'
 import Card from '../../Components/Card'
@@ -7,6 +7,8 @@ import BoldText from '../../Components/BoldText'
 import NormalText from '../../Components/NormalText'
 import InputContainer from '../../Components/InputContainer'
 import RBContainer from '../../Components/RBContainer'
+import CustomButton from '../../Components/Button'
+import {CommonStyle} from '../../CommonStyle/CommonStyle'
 
 class Registration extends React.Component{
     constructor()
@@ -97,86 +99,92 @@ class Registration extends React.Component{
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>NSE Member Id</NormalText>
-                        <TextInput placeholder="Enter NSE Member ID" onChangeText={(e)=>this.setState({NSEMemberId:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter NSE Member ID" onChangeText={(e)=>this.setState({NSEMemberId:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>BSE Member Id</NormalText>
-                        <TextInput placeholder="Enter BSE Member ID" onChangeText={(e)=>this.setState({BSEMemberId:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter BSE Member ID" onChangeText={(e)=>this.setState({BSEMemberId:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
                     
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>NCDEX Member Id</NormalText>
-                        <TextInput placeholder="Enter NCDEX Member ID" onChangeText={(e)=>this.setState({NCDEXMemberId:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter NCDEX Member ID" onChangeText={(e)=>this.setState({NCDEXMemberId:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>MCX Member Id</NormalText>
-                        <TextInput placeholder="Enter NCDEX Member ID" onChangeText={(e)=>this.setState({MCXMemberId:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter NCDEX Member ID" onChangeText={(e)=>this.setState({MCXMemberId:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
                     
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>CSDL No.</NormalText>
-                        <TextInput placeholder="Enter CSDL No." onChangeText={(e)=>this.setState({CSDLNo:e})}  style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter CSDL No." onChangeText={(e)=>this.setState({CSDLNo:e})}  style={CommonStyle.TextInputs}></TextInput>
                     </View>
                     
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>NSDL NO.</NormalText>
-                        <TextInput placeholder="Enter NSDL No." onChangeText={(e)=>this.setState({NSDLNo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter NSDL No." onChangeText={(e)=>this.setState({NSDLNo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>MSEI No.</NormalText>
                        
-                        <TextInput placeholder="Enter MSEI No." onChangeText={(e)=>this.setState({MSEINo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter MSEI No." onChangeText={(e)=>this.setState({MSEINo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>(*)SEBI Registration No.</NormalText>
                         {this.state.ErrorCode === 1 ? <NormalText style={styles.ErrorText}>SEBI No.Cannot Be Left Blank</NormalText>:null}
-                        <TextInput placeholder="Enter SEBI No." onChangeText={(e)=>this.setState({SEBINo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter SEBI No." onChangeText={(e)=>this.setState({SEBINo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>Research Analyst No.</NormalText>
-                        <TextInput placeholder="Enter Research Analyst No." onChangeText={(e)=>this.setState({ResearchAnalystNo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Research Analyst No." onChangeText={(e)=>this.setState({ResearchAnalystNo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>ARN No.</NormalText>
-                        <TextInput placeholder="Enter ARN No." onChangeText={(e)=>this.setState({ARNNo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter ARN No." onChangeText={(e)=>this.setState({ARNNo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>Investment Advisory No.</NormalText>
-                        <TextInput placeholder="Enter Investment Advisory No." onChangeText={(e)=>this.setState({InvestmentAdvisoryNo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Investment Advisory No." onChangeText={(e)=>this.setState({InvestmentAdvisoryNo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>IRDAC Corporate Agency No.</NormalText>
-                        <TextInput placeholder="Enter IRDAC Corporate Agency No." onChangeText={(e)=>this.setState({IRDANo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter IRDAC Corporate Agency No." onChangeText={(e)=>this.setState({IRDANo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>PMS No.</NormalText>
-                        <TextInput placeholder="Enter PMS No." onChangeText={(e)=>this.setState({PMSNo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter PMS No." onChangeText={(e)=>this.setState({PMSNo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>(*) CIN No.</NormalText>
                         {this.state.ErrorCode === 2 ? <NormalText style={styles.ErrorText}>CIN No. Cannot Be Left Blank</NormalText>:null}
-                        <TextInput placeholder="Enter PMS No." onChangeText={(e)=>this.setState({CINNo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter PMS No." onChangeText={(e)=>this.setState({CINNo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
                     <View style={styles.TextInputContainer}>
                         <NormalText style={styles.OverideNormalText}>Asset Management Company Number</NormalText>
-                        <TextInput placeholder="Enter Asset Management Company Number" onChangeText={(e)=>this.setState({AssetManegmentNo:e})} style={styles.TextInput}></TextInput>
+                        <TextInput placeholder="Enter Asset Management Company Number" onChangeText={(e)=>this.setState({AssetManegmentNo:e})} style={CommonStyle.TextInputs}></TextInput>
                     </View>
 
-                    <View style={styles.ButtonContainer}>
-                        <Button title="Proceed" onPress={()=>this.onRegistrationDetailsSubmit()} color="#f5bb18" />
-                    </View>
+                    <TouchableOpacity style={{width:'100%',alignItems:'center',marginBottom:10}} onPress={()=>this.onRegistrationDetailsSubmit()}>
+                        <CustomButton>
+                            {!this.state.isLoading ? 
+                            <NormalText style={{color:'white',marginBottom:0}}>SUBMIT DETAILS</NormalText>:
+                            <ActivityIndicator size="small" color="#fff" />}
+                        </CustomButton>
+                </TouchableOpacity>
                 </Card>
+
+                
 
             </Container>
       
