@@ -4,6 +4,7 @@ import MWisrNavigator from '../Navigator/Navigator'
 import { connect }from 'react-redux'
 import {setMsg} from '../store/Actions/ActionLogin'
 import NormalText from './NormalText'
+import {FontAwesome}  from '@expo/vector-icons';
 
 
 class MainLayout extends React.Component{
@@ -27,7 +28,7 @@ class MainLayout extends React.Component{
        
         if(prevProps.ErrMsg !== this.props.ErrMsg)
         {
-            console.log("Updated Error Code :" + this.props.ErrMsg )
+            console.log("Updated Error Code :" + this.props.ErrMsg)
           switch(this.props.ErrMsg)
           {
               case 401:
@@ -103,8 +104,13 @@ class MainLayout extends React.Component{
             <View style={{flex:1}}>
                 {this.state.DisplayMsg ? 
                     <View style={styles.ErrorMsg}>
-                        <NormalText style={styles.ErrorHeading}>{this.state.ErrorMsg1}</NormalText>
-                        <NormalText style={styles.ErrorDesc}>{this.state.ErrorMsg2}</NormalText>
+                        <View style={{width:'30%',alignItems:'center'}}>
+                            <FontAwesome name="exclamation-triangle" size={36} color="white" />
+                        </View>
+                        <View style={{width:'70%'}}>
+                            <NormalText style={styles.ErrorHeading}>{this.state.ErrorMsg1}</NormalText>
+                            <NormalText style={styles.ErrorDesc}>{this.state.ErrorMsg2}</NormalText>
+                        </View>
                     </View>
                 :null}
                 <MWisrNavigator />
@@ -115,6 +121,7 @@ class MainLayout extends React.Component{
 
 const styles=StyleSheet.create({
     ErrorMsg:{
+        flexDirection:'row',
         width:'100%',
         backgroundColor:'#ed4356',
         alignItems:'center',

@@ -1,5 +1,5 @@
 import React,{component} from 'react'
-import {View,StyleSheet} from 'react-native'
+import {View,StyleSheet,AsyncStorage} from 'react-native'
 import StepIndicator from 'react-native-step-indicator';
 import ContactDetails from './ContactDetails'
 import { ScrollView, Switch } from 'react-native-gesture-handler'
@@ -94,6 +94,15 @@ class OnBoarding extends React.Component{
                 else if(result.Data.WhereToGo === "DB")
                 {
                     this.props.navigation.navigate(CheckWhereToGo(result.Data.WhereToGo))
+                    // AsyncStorage.setItem('User',this.props.ReduxLoginPayload).then(()=>{
+                    //     console.log("Hello Asyc")
+                    //     AsyncStorage.getItem('User').then( User =>{
+                    //         console.log("User Payload Onboarding",User)
+                    //     })
+                       
+                    // }).catch(err=>{
+                    //     console.log("Async Error :",err)
+                    // }) 
                 }
                 
               }
