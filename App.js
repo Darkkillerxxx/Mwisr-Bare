@@ -7,13 +7,8 @@ import loginReducer from './store/Reducers/login'
 import {AppLoading} from 'expo'
 import * as Fonts from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen';
+import store from './store/store'
 
-
-const rootReducer=combineReducers({
-  login:loginReducer
-})
-
-const store=createStore(rootReducer)
 
 class App extends React.Component {
   

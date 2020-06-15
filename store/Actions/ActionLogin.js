@@ -1,13 +1,15 @@
-import {SET_LOGIN} from './actionType'
+import {SET_LOGIN,SET_MSG} from './actionType'
 
 export const setLogin = (loginResponse) => {
-    // console.log("IN ActionTypes",{
-    //     type:SET_LOGIN,
-    //     payload:loginResponse
-    // })
-
     return {
         type:SET_LOGIN,
         payload:loginResponse
+    }
+}
+
+export const setMsg = (Msg)=>{
+    return{
+        type:SET_MSG,
+        payload:Msg
     }
 }
