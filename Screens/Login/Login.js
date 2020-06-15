@@ -10,6 +10,9 @@ import {setLogin} from '../../store/Actions/ActionLogin'
 import * as Animatable from 'react-native-animatable';
 import CustomButton from '../../Components/Button'
 import {CommonStyle} from '../../CommonStyle/CommonStyle'
+import FlashMessage from "react-native-flash-message";
+import { showMessage, hideMessage } from "react-native-flash-message";
+
 
 const ZoomIn = {
     from: {
@@ -34,6 +37,7 @@ class Login extends React.Component{
           ShowAnimation:false
       }
   }
+
 
   SwitchToRegister=()=>{
     this.props.navigation.navigate('Register')
@@ -108,35 +112,40 @@ class Login extends React.Component{
 }
 
 
+    componentDidMount(){
+        console.log("Test Error Msg : ",this.props.ErrMsg)
+    }
+
 
     render()
     {
         return(
           <Container>
-            <Card>
-                <Image style={style.Logo} source={require('../../assets/Images/logo.png')}/>
-                <BoldText style={style.LoginText}>Login</BoldText>
-                <NormalText style={style.LoginTextDesc}>Welcome Back,You Missed on Good Tips This Is What Happens!</NormalText>
+             <FlashMessage position="top" />
+                <Card>
+                    <Image style={style.Logo} source={require('../../assets/Images/logo.png')}/>
+                    <BoldText style={style.LoginText}>Login</BoldText>
+                    <NormalText style={style.LoginTextDesc}>Welcome Back,You Missed on Good Tips This Is What Happens!</NormalText>
 
-                {this.state.ErrCode === 1 ? <NormalText style={style.ErrorText}>Email Cannot Be Left Empty</NormalText>:null}
-                <TextInput placeholder="Enter Email or Mobile.No" onChangeText={(e)=>this.setState({Email:e})} style={CommonStyle.TextInputs}/>
-                {this.state.ErrCode === 2 ? <NormalText style={style.ErrorText}>Password Cannot Be Left Empty</NormalText>:null}
-                <TextInput placeholder="Enter Password" onChangeText={(e)=>this.setState({Password:e})} secureTextEntry={true} style={CommonStyle.TextInputs}/>
+                    {this.state.ErrCode === 1 ? <NormalText style={style.ErrorText}>Email Cannot Be Left Empty</NormalText>:null}
+                    <TextInput placeholder="Enter Email or Mobile.No" onChangeText={(e)=>this.setState({Email:e})} style={CommonStyle.TextInputs}/>
+                    {this.state.ErrCode === 2 ? <NormalText style={style.ErrorText}>Password Cannot Be Left Empty</NormalText>:null}
+                    <TextInput placeholder="Enter Password" onChangeText={(e)=>this.setState({Password:e})} secureTextEntry={true} style={CommonStyle.TextInputs}/>
 
-                <TouchableOpacity style={style.ButtonContainer} onPress={()=>this.Login()} >
-                    <CustomButton>
-                        {!this.state.isLoading ? 
-                        <NormalText style={{color:'white',marginBottom:0}}>LOGIN</NormalText>:
-                        <ActivityIndicator size="small" color="#fff" />}
-                    </CustomButton>
-                </TouchableOpacity>
-                
+                    <TouchableOpacity style={style.ButtonContainer} onPress={()=>this.Login()} >
+                        <CustomButton>
+                            {!this.state.isLoading ? 
+                            <NormalText style={{color:'white',marginBottom:0}}>LOGIN</NormalText>:
+                            <ActivityIndicator size="small" color="#fff" />}
+                        </CustomButton>
+                    </TouchableOpacity>
+                    
 
-                <NormalText style={style.FPText}>Dont Have an Account? </NormalText>
-                <TouchableOpacity onPress={()=>this.SwitchToRegister()}>
-                    <Text style={style.SignUpText}>Sign up</Text>
-                </TouchableOpacity>
-            </Card>
+                    <NormalText style={style.FPText}>Dont Have an Account? </NormalText>
+                    <TouchableOpacity onPress={()=>this.SwitchToRegister()}>
+                        <Text style={style.SignUpText}>Sign up</Text>
+                    </TouchableOpacity>
+                </Card>
       </Container>
         )
     }
@@ -185,7 +194,8 @@ const style=StyleSheet.create({
 
 const mapStateToProps= state =>{
     return{
-        loginState:state.login.login
+        loginState:state.login.login,
+        ErrMsg:state.login.ErrorMsg
     }
 }
 
