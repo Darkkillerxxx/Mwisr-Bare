@@ -24,8 +24,8 @@ class App extends React.Component {
 
  LoadFonts=()=>{
     Fonts.loadAsync({
-     'open-sans':require('./assets/Fonts/OpenSans-Regular.ttf'),
-     'open-sans-bold':require('./assets/Fonts/OpenSans-Bold.ttf')
+     'open-sans':require('./assets/Fonts/Roboto-Light.ttf'),
+     'open-sans-bold':require('./assets/Fonts/Roboto-Bold.ttf')
    }).then(() => {
       this.setState({hasLoaded:true},async ()=>{
         await SplashScreen.hideAsync()

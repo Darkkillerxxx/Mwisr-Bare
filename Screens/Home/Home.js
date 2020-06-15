@@ -1,5 +1,5 @@
 import React from 'react'
-import { View,Text } from 'react-native';
+import { View,Text,AsyncStorage} from 'react-native';
 import { connect }from 'react-redux'
 import {login_call, GetAuthHeader,CheckWhereToGo} from '../../Utils/api.js'
 import {setLogin} from '../../store/Actions/ActionLogin'

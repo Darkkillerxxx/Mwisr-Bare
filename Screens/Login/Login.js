@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View,Image,TextInput,TouchableOpacity,Button,ActivityIndicator,Keyboard } from 'react-native';
+import { StyleSheet, Text, View,Image,TextInput,TouchableOpacity,Button,ActivityIndicator,Keyboard,AsyncStorage } from 'react-native';
 import Container from '../../Components/Container'
 import Card from '../../Components/Card'
 import BoldText from '../../Components/BoldText'
@@ -98,6 +98,11 @@ class Login extends React.Component{
                         this.props.onSetLogin(ReduxLoginPayload)
                         console.log("81",this.props.loginState)
                         this.setState({isLoading:false})
+                        AsyncStorage.setItem('User',JSON.stringify(ReduxLoginPayload)).then(()=>{
+                            console.log("Storage Created")
+                        }).catch(err=>{
+                            console.log("Async Login Error",err)
+                        })
                         this.props.navigation.navigate(CheckWhereToGo(result.Data.WhereToGo))
                     }
                 })
@@ -113,7 +118,13 @@ class Login extends React.Component{
 
 
     componentDidMount(){
-        console.log("Test Error Msg : ",this.props.ErrMsg)
+       AsyncStorage.getItem('User').then( User =>{
+           console.log("User Payload",User)
+           if(User !== null)
+           {
+               this.props.navigation.navigate("Home")
+           }
+       })
     }
 
 
