@@ -15,6 +15,10 @@ export const CommonStyle=StyleSheet.create({
     FlexInputs:{
         width:'50%',
         alignItems:'center'
+    },
+    AnimatedInputContainer:{
+        width:'100%',
+        alignItems:'center'
     }
 })
 

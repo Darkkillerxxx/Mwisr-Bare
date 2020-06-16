@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View,Image,TextInput,TouchableOpacity,Button,ActivityIndicator,Keyboard } from 'react-native';
+import { StyleSheet, Text, View,Image,TextInput,TouchableOpacity,Button,ActivityIndicator,Keyboard,AsyncStorage } from 'react-native';
 import Container from '../../Components/Container'
 import Card from '../../Components/Card'
 import BoldText from '../../Components/BoldText'
@@ -10,6 +10,7 @@ import {setLogin} from '../../store/Actions/ActionLogin'
 import * as Animatable from 'react-native-animatable';
 import CustomButton from '../../Components/Button'
 import {CommonStyle} from '../../CommonStyle/CommonStyle'
+import { NavigationActions } from 'react-navigation';
 
 const ZoomIn = {
     from: {
@@ -34,6 +35,7 @@ class Login extends React.Component{
           ShowAnimation:false
       }
   }
+
 
   SwitchToRegister=()=>{
     this.props.navigation.navigate('Register')
@@ -94,7 +96,13 @@ class Login extends React.Component{
                         this.props.onSetLogin(ReduxLoginPayload)
                         console.log("81",this.props.loginState)
                         this.setState({isLoading:false})
-                        this.props.navigation.navigate(CheckWhereToGo(result.Data.WhereToGo))
+                        AsyncStorage.setItem('User',JSON.stringify(ReduxLoginPayload)).then(()=>{
+                            console.log("Storage Created")
+                        }).catch(err=>{
+                            console.log("Async Login Error",err)
+                        })
+                        this.props.navigation.navigate('ProDB',{},NavigationActions.navigate({routeName:result.Data.WhereToGo}))
+                        // this.props.navigation.navigate(CheckWhereToGo(result.Data.WhereToGo))
                     }
                 })
             }
@@ -108,35 +116,47 @@ class Login extends React.Component{
 }
 
 
+    componentDidMount(){
+       AsyncStorage.getItem('User').then( User =>{
+           console.log("User Payload",User)
+           if(User !== null)
+           {
+                let LoginReduxSate=JSON.parse(User)
+                this.props.onSetLogin(LoginReduxSate)
+                this.props.navigation.navigate('ProDB',{},NavigationActions.navigate({routeName:'Home'}))
+           }
+       })
+    }
+
 
     render()
     {
         return(
           <Container>
-            <Card>
-                <Image style={style.Logo} source={require('../../assets/Images/logo.png')}/>
-                <BoldText style={style.LoginText}>Login</BoldText>
-                <NormalText style={style.LoginTextDesc}>Welcome Back,You Missed on Good Tips This Is What Happens!</NormalText>
+                <Card>
+                    <Image style={style.Logo} source={require('../../assets/Images/logo.png')}/>
+                    <BoldText style={style.LoginText}>Login</BoldText>
+                    <NormalText style={style.LoginTextDesc}>Welcome Back,You Missed on Good Tips This Is What Happens!</NormalText>
 
-                {this.state.ErrCode === 1 ? <NormalText style={style.ErrorText}>Email Cannot Be Left Empty</NormalText>:null}
-                <TextInput placeholder="Enter Email or Mobile.No" onChangeText={(e)=>this.setState({Email:e})} style={CommonStyle.TextInputs}/>
-                {this.state.ErrCode === 2 ? <NormalText style={style.ErrorText}>Password Cannot Be Left Empty</NormalText>:null}
-                <TextInput placeholder="Enter Password" onChangeText={(e)=>this.setState({Password:e})} secureTextEntry={true} style={CommonStyle.TextInputs}/>
+                    {this.state.ErrCode === 1 ? <NormalText style={style.ErrorText}>Email Cannot Be Left Empty</NormalText>:null}
+                    <TextInput placeholder="Enter Email or Mobile.No" onChangeText={(e)=>this.setState({Email:e})} style={CommonStyle.TextInputs}/>
+                    {this.state.ErrCode === 2 ? <NormalText style={style.ErrorText}>Password Cannot Be Left Empty</NormalText>:null}
+                    <TextInput placeholder="Enter Password" onChangeText={(e)=>this.setState({Password:e})} secureTextEntry={true} style={CommonStyle.TextInputs}/>
 
-                <TouchableOpacity style={style.ButtonContainer} onPress={()=>this.Login()} >
-                    <CustomButton>
-                        {!this.state.isLoading ? 
-                        <NormalText style={{color:'white',marginBottom:0}}>LOGIN</NormalText>:
-                        <ActivityIndicator size="small" color="#fff" />}
-                    </CustomButton>
-                </TouchableOpacity>
-                
+                    <TouchableOpacity style={style.ButtonContainer} onPress={()=>this.Login()} >
+                        <CustomButton>
+                            {!this.state.isLoading ? 
+                            <NormalText style={{color:'white',marginBottom:0}}>LOGIN</NormalText>:
+                            <ActivityIndicator size="small" color="#fff" />}
+                        </CustomButton>
+                    </TouchableOpacity>
+                    
 
-                <NormalText style={style.FPText}>Dont Have an Account? </NormalText>
-                <TouchableOpacity onPress={()=>this.SwitchToRegister()}>
-                    <Text style={style.SignUpText}>Sign up</Text>
-                </TouchableOpacity>
-            </Card>
+                    <NormalText style={style.FPText}>Dont Have an Account? </NormalText>
+                    <TouchableOpacity onPress={()=>this.SwitchToRegister()}>
+                        <Text style={style.SignUpText}>Sign up</Text>
+                    </TouchableOpacity>
+                </Card>
       </Container>
         )
     }
@@ -185,7 +205,8 @@ const style=StyleSheet.create({
 
 const mapStateToProps= state =>{
     return{
-        loginState:state.login.login
+        loginState:state.login.login,
+        ErrMsg:state.login.ErrorMsg
     }
 }
 

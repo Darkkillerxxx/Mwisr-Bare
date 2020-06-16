@@ -1,7 +1,10 @@
 import Convert from "./System/System.Convert";
 import RSA from "./System/System.Security.Cryptography.RSA";
 import Text from "./System/System.Text";
+import store from '../store/store'
+import {setMsg} from '../store/Actions/ActionLogin'
 
+// store.dispatch(setMsg("This is a Test Message"))
 const base_url_wealthyFox="https://wfanalytics.mwisr.com//api//"
 const base_url_Mwisr="https://wfanalytics.mwisr.com//api//"
 
@@ -17,7 +20,8 @@ const endpoint_url={
     UpsertCompanyDetail:base_url_Mwisr+"Broker/UpsertCompanyDetail",
     GetCreditPackages:base_url_wealthyFox + "/UserLicense/GetCreditPackages",
     ApplyCreditPackage:base_url_wealthyFox+"UserLicense/ApplyCreditPackage/",
-    UpsertCustomerAnswers:base_url_Mwisr+"AnalystRegistration/UpsertCustomerAnswers"
+    UpsertCustomerAnswers:base_url_Mwisr+"AnalystRegistration/UpsertCustomerAnswers",
+    GetUserPhoto:base_url_Mwisr+"Analyst/GetUserPhoto"
 }
 
 const headers = {
@@ -213,25 +217,11 @@ export function verify_OTP(OTP,authHeader) {
         }
         else if(this.readyState === 4 && this.status === 401)
         {
-        //   console.log("Session Invalid")
-        //   // let failresponse={
-        //   //           IsSuccess:false,
-        //   //           Msg:"Session Invalid",
-        //   //           Code:401
-        //   // }  
-        //   // resolve(JSON.stringify(failresponse)) 
-        //   store.dispatch(changeErrorCode(401))
+            store.dispatch(setMsg(401))
         }
         else if(this.readyState === 4 && this.status === 500)
         {
-        //   console.log("Session Invalid")
-        //   // let failresponse={
-        //   //           IsSuccess:false,
-        //   //           Msg:"Session Invalid",
-        //   //           Code:401
-        //   // }  
-        //   // resolve(JSON.stringify(failresponse)) 
-        //   store.dispatch(changeErrorCode(500))
+          store.dispatch(setMsg(500))
         }
       };
       httpx.onerror = reject;
@@ -249,6 +239,7 @@ export function verify_OTP(OTP,authHeader) {
       httpx.limit = 5;
       httpx.onerror = function(e) {
         console.log("Network error", this.timer, this.limit);
+        store.dispatch(setMsg(504))
         // while (this.timer <= this.limit) {
         //   setTimeout(() => {
         //     apiCall(url, method, params, authHeader);
@@ -260,6 +251,7 @@ export function verify_OTP(OTP,authHeader) {
   
       httpx.ontimeout = function(e) {
         console.log("Timeout");
+        store.dispatch(setMsg(408))
         // while (this.timer <= this.limit) {
         //   setTimeout(() => {
         //     apiCall(url, method, params, authHeader);
@@ -343,6 +335,16 @@ export function get_credit_packages(authHeader) {
 
 export function apply_credit_package(authHeader, data) {
   return apiCall(endpoint_url["ApplyCreditPackage"], "GET", data, authHeader)
+    .then(response => {
+      return JSON.parse(response);
+    })
+    .catch(err => {
+      console.log(err, "err");
+    });
+}
+
+export function get_user_photo(authHeader) {
+  return apiCall(endpoint_url["GetUserPhoto"], "GET", "", authHeader)
     .then(response => {
       return JSON.parse(response);
     })

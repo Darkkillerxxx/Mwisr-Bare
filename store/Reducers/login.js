@@ -1,7 +1,8 @@
-import  {SET_LOGIN} from '../Actions/actionType'
+import  {SET_LOGIN,SET_MSG} from '../Actions/actionType'
 
 const initialState={
-    login:[]
+    login:[],
+    ErrorMsg:null
 }
 
 const loginReducer=(state = initialState,action)=>{
@@ -13,6 +14,13 @@ const loginReducer=(state = initialState,action)=>{
                 ...state,
                 login:action.payload
             };
+        
+        case SET_MSG:
+            return{
+                ...state,
+                ErrorMsg:action.payload
+            };
+
         default:
             return state
     }

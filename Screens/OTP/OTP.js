@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View,Image,TextInput, Button,TouchableWithoutFeedback,findNodeHandle } from 'react-native';
+import { StyleSheet, Text, View,Image,TextInput, Button,TouchableWithoutFeedback,findNodeHandle,ActivityIndicator,TouchableOpacity } from 'react-native';
 import { connect }from 'react-redux'
 import {login_call, GetAuthHeader,CheckWhereToGo,send_OTP,verify_OTP} from '../../Utils/api.js'
 import {setLogin} from '../../store/Actions/ActionLogin'
@@ -7,6 +7,8 @@ import Container from '../../Components/Container'
 import Card from '../../Components/Card'
 import BoldText from '../../Components/BoldText'
 import NormalText from '../../Components/NormalText'
+import {CommonStyle} from '../../CommonStyle/CommonStyle'
+import CustomButton from '../../Components/Button'
 
 class OTP extends React.Component{
     constructor()
@@ -96,12 +98,17 @@ class OTP extends React.Component{
                     <NormalText style={style.OTPTextDesc}>We have Sent You a 4 digit OTP Number</NormalText>
                     {this.state.ErrCode === 1 ? <NormalText style={style.ErrorText}>Please Enter a Valid OTP</NormalText>:null}           
                     <View style={style.OtpInputContainer}>
-                        <TextInput placeholder="Enter OTP" onChangeText={(e)=>this.setState({OTP:e})} maxLength={4} keyboardType="number-pad" style={style.OTPInput}/>
+                        <TextInput placeholder="Enter OTP" onChangeText={(e)=>this.setState({OTP:e})} maxLength={4} keyboardType="number-pad" style={CommonStyle.TextInputs}/>
                     </View>
 
-                    <View style={style.OTPButtonContainer}>
-                        <Button title="Submit OTP" onPress={()=>this.onSubmitOTP()} color="#f5bb18" />
-                    </View>
+                    
+                    <TouchableOpacity style={{width:'100%',alignItems:'center',marginBottom:10}} onPress={()=>this.onSubmitOTP()}>
+                        <CustomButton>
+                            {!this.state.isLoading ? 
+                            <NormalText style={{color:'white',marginBottom:0}}>SUBMIT OTP</NormalText>:
+                            <ActivityIndicator size="small" color="#fff" />}
+                        </CustomButton>
+                    </TouchableOpacity>
                 </Card>
             </Container>
         )
