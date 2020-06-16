@@ -5,7 +5,7 @@ import {login_call, GetAuthHeader,CheckWhereToGo} from '../../Utils/api.js'
 import {setLogin} from '../../store/Actions/ActionLogin'
 
 
-class Home extends React.Component{
+class AddPackage extends React.Component{
     constructor()
     {
         super();
@@ -20,10 +20,8 @@ class Home extends React.Component{
     render()
     {
         return(
-            <View style={{flex:1,alignItems:'center',justifyContent:'flex-start'}}>
-               <View style={{width:'100%',height:200,borderColor:'black',borderWidth:1}}>
-                   
-               </View>
+            <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+               <Text>Add Package</Text>
             </View>
         )
     }
@@ -41,4 +39,4 @@ const mapDispatchToProps = dispatch =>{
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(Home);
+export default connect(mapStateToProps,mapDispatchToProps)(AddPackage);

@@ -10,9 +10,7 @@ import {setLogin} from '../../store/Actions/ActionLogin'
 import * as Animatable from 'react-native-animatable';
 import CustomButton from '../../Components/Button'
 import {CommonStyle} from '../../CommonStyle/CommonStyle'
-import FlashMessage from "react-native-flash-message";
-import { showMessage, hideMessage } from "react-native-flash-message";
-
+import { NavigationActions } from 'react-navigation';
 
 const ZoomIn = {
     from: {
@@ -103,7 +101,8 @@ class Login extends React.Component{
                         }).catch(err=>{
                             console.log("Async Login Error",err)
                         })
-                        this.props.navigation.navigate(CheckWhereToGo(result.Data.WhereToGo))
+                        this.props.navigation.navigate('ProDB',{},NavigationActions.navigate({routeName:result.Data.WhereToGo}))
+                        // this.props.navigation.navigate(CheckWhereToGo(result.Data.WhereToGo))
                     }
                 })
             }
@@ -122,7 +121,9 @@ class Login extends React.Component{
            console.log("User Payload",User)
            if(User !== null)
            {
-               this.props.navigation.navigate("Home")
+                let LoginReduxSate=JSON.parse(User)
+                this.props.onSetLogin(LoginReduxSate)
+                this.props.navigation.navigate('ProDB',{},NavigationActions.navigate({routeName:'Home'}))
            }
        })
     }
@@ -132,7 +133,6 @@ class Login extends React.Component{
     {
         return(
           <Container>
-             <FlashMessage position="top" />
                 <Card>
                     <Image style={style.Logo} source={require('../../assets/Images/logo.png')}/>
                     <BoldText style={style.LoginText}>Login</BoldText>
