@@ -15,7 +15,8 @@ const BoldText = (props) => {
 const styles=StyleSheet.create({
     BoldText:{
         marginVertical:10,
-        fontSize:18
+        fontSize:18,
+        fontFamily:'open-sans-bold'
     },
 })
 
