@@ -1,11 +1,10 @@
 import React from 'react'
-import { View,Text,AsyncStorage, StyleSheet} from 'react-native';
+import { View,Text,AsyncStorage, StyleSheet,TouchableOpacity, FlatList} from 'react-native';
 import { connect }from 'react-redux'
 import {login_call, GetAuthHeader,get_calls,ArrangeCalls} from '../../Utils/api.js'
 import {setLogin} from '../../store/Actions/ActionLogin'
 import Container from '../../Components/Container.js';
 import NormalText from '../../Components/NormalText'
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import BoldText from '../../Components/BoldText.js';
 import {FontAwesome}  from '@expo/vector-icons';
 
@@ -22,17 +21,19 @@ class Home extends React.Component{
 
     componentDidMount()
     {
-        // this.getCalls(1,"")
+        this.getCalls(1,"")
     }
 
     SelectTab=(TabId)=>{
-        this.setState({SelectedTab:TabId})
+        this.setState({SelectedTab:TabId},()=>{
+            this.getCalls(1,"")
+        })
     }
 
     getCalls(pageNo,type,showActive = "true") {
             get_calls(this.props.loginState.AuthHeader, {
               forUserId:"",
-              userTypeId:"",
+              userTypeId:this.state.SelectedTab,
               showActive: showActive,
               forOwnerId:"",
               packageId:"",
@@ -49,6 +50,41 @@ class Home extends React.Component{
                 })
             });
       }
+
+    ShowCalls=(itemData)=>{
+        return(
+            <TouchableOpacity style={{width:'100%'}}>
+                <View style={styles.CallLegContainer}>
+                    <NormalText style={styles.SegmentName}>{itemData.item.Legs[0].StrategyName}</NormalText>
+                        {itemData.item.Legs.map(result=>{
+                            console.log("Flatlist Result",result)
+                            return(
+                                <View style={{flexDirection:'row',width:"100%",marginBottom:10}}>
+                                    <View style={styles.BuySell}>
+                                        <View style={result.BuySell === "BUY" ? styles.Buy:styles.Sell}>
+                                            <NormalText style={{marginBottom:0,color:'white'}}>{result.BuySell}</NormalText>
+                                        </View>
+                                    </View>
+                                    <View style={styles.CallInfoContainer}> 
+                                        <BoldText style={styles.CustomBoldText}>{result.Scrip} 31-JAN-2020</BoldText>
+                                        <NormalText style={styles.CustomNormalText}>1/12/2019 16:09:43</NormalText>
+                                        <BoldText style={styles.CustomBoldText}>Call By : {result.OwnerName}</BoldText>
+                                    </View>
+                                    <View style={styles.ProfitContainer}> 
+                                        <BoldText style={styles.ProfitNormalText}>Profit</BoldText>
+                                        <View style={styles.ProfitNoContainer}>
+                                            <NormalText style={styles.ProfitNo}>350000</NormalText>
+                                            <FontAwesome name="rupee" size={15} color="green" />
+                                        </View>
+                                    </View>
+                                </View>
+                            )
+                        })}
+                        
+                </View>
+            </TouchableOpacity>
+        )
+    }
 
     render()
     {
@@ -79,27 +115,10 @@ class Home extends React.Component{
                     </View>
                 </View>
                 <View style={styles.CallsContainer}>
-                    <View style={styles.CallLegContainer}>
-                        <NormalText style={{backgroundColor:'#c5c4c4',padding:5,borderRadius:10,color:'white'}}>Intraday</NormalText>
-                        <View style={{flexDirection:'row',width:"100%"}}>
-                            <View style={{width:'15%',alignItems:'center',justifyContent:'center'}}>
-                                <NormalText style={{backgroundColor:'#16d39a',padding:15,borderRadius:5,color:'white'}}>Buy</NormalText>
-                            </View>
-                            <View style={{width:'60%',marginLeft:10,alignItems:'flex-start',justifyContent:'flex-start'}}> 
-                                <BoldText style={{marginBottom:0,fontSize:12,marginVertical:0}}>INFY 31-JAN-2020</BoldText>
-                                <NormalText style={{marginBottom:0}}>1/12/2019 16:09:43</NormalText>
-                                <BoldText style={{marginBottom:0,fontSize:12,marginVertical:0}}>Call By : Adwait Dabholkar</BoldText>
-                            </View>
-                            <View style={{width:'25%',marginLeft:5,alignItems:'center',justifyContent:'space-evenly'}}> 
-                                <BoldText style={{marginBottom:0,fontSize:12,marginVertical:0,color:'green'}}>Profit</BoldText>
-                                <View style={{flexDirection:'row',width:'100%',alignItems:'center',justifyContent:'center'}}>
-                                    <NormalText style={{marginBottom:0,color:'green',marginRight:5}}>350000</NormalText>
-                                    <FontAwesome name="rupee" size={15} color="green" />
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    
+                  <FlatList
+                        keyExtractor={(item, index) => item.Index}
+                        data={this.state.ManagedCalls}
+                        renderItem={this.ShowCalls} />
                 </View>     
             </Container>
         )
@@ -142,7 +161,74 @@ const styles=StyleSheet.create({
     },
     CallLegContainer:{
         paddingHorizontal:10,
-        alignItems:'flex-start'
+        alignItems:'flex-start',
+        marginBottom:5
+    },
+    SegmentName:{
+        backgroundColor:'#c5c4c4',
+        padding:5,
+        borderRadius:10,
+        color:'white'
+    },
+    BuySell:{
+        width:'20%',
+        alignItems:'flex-start',
+        justifyContent:'center'
+    },
+    Buy:{
+        backgroundColor:'#16d39a',
+        padding:10,
+        borderRadius:5
+    },
+    Sell:{
+        backgroundColor:'#ff6961',
+        padding:10,
+        borderRadius:5
+    },
+    CallInfoContainer:{
+        width:'55%',
+        marginLeft:10,
+        alignItems:'flex-start',
+        justifyContent:'flex-start'
+    },
+    CustomBoldText:{
+        marginBottom:0,
+        fontSize:12,
+        marginVertical:0
+    },
+    CustomNormalText:{
+        marginBottom:0
+    },
+    ProfitContainer:{
+        width:'25%',
+        marginLeft:5,
+        alignItems:'center',
+        justifyContent:'space-evenly'
+    },
+    ProfitNormalText:{
+        marginVertical:0,
+        marginTop:0,
+        marginBottom:0,
+        fontSize:12,
+        marginVertical:0,
+        color:'green'
+    },
+    LossNormalText:{
+        marginBottom:0,
+        fontSize:12,
+        marginVertical:0,
+        color:'red'
+    },
+    ProfitNoContainer:{
+        flexDirection:'row',
+        width:'100%',
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    ProfitNo:{
+        marginBottom:0,
+        color:'green',
+        marginRight:5
     }
     
 })
