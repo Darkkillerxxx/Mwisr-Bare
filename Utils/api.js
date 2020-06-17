@@ -21,7 +21,8 @@ const endpoint_url={
     GetCreditPackages:base_url_wealthyFox + "/UserLicense/GetCreditPackages",
     ApplyCreditPackage:base_url_wealthyFox+"UserLicense/ApplyCreditPackage/",
     UpsertCustomerAnswers:base_url_Mwisr+"AnalystRegistration/UpsertCustomerAnswers",
-    GetUserPhoto:base_url_Mwisr+"Analyst/GetUserPhoto"
+    GetUserPhoto:base_url_Mwisr+"Analyst/GetUserPhoto",
+    GetCalls: base_url_wealthyFox+"RTTracker/GetCalls/",
 }
 
 const headers = {
@@ -49,6 +50,7 @@ const headers = {
      .filter(x=>x[0])
      .reduce((ac, x)=>{ac[x[0]] = x[1];return ac;}, {});
   }
+  
 
   function createGETParams(params) {
     if (Object.keys(params).length === 0) return "";
@@ -84,6 +86,34 @@ const headers = {
       Text.Encoding.Unicode.GetBytes(encryptedBase64)
     );
   }
+
+  
+function parseCSV(csvString) {
+  csvString = csvString.replace(/"/g, "");
+
+  var lines = csvString.split("\\r\\n");
+
+  // console.log("lines", lines);
+
+  lines.map((line, i) => {
+    // console.log(i);
+    // console.log(line);
+    lines[i] = line.split(",");
+  });
+
+  var parsedCSV = [];
+  for (var i = 1; i < lines.length; i++) {
+    var obj = {};
+
+    for (var j = 0; j < lines[0].length; j++) {
+      obj[lines[0][j]] = lines[i][j];
+    }
+
+    parsedCSV.push(obj);
+  }
+  parsedCSV.pop();
+  return parsedCSV;
+}
 
  
   export function CheckWhereToGo(location){
@@ -125,9 +155,6 @@ const headers = {
 }
 
 export function send_OTP(UserId,authHeader) {
-  // console.log("426",emailId)
-  // console.log(password, phno);
-  // let authHeader = GetAuthHeader(emailId, password,phno);
   const data = {
     AnalystId: UserId
   };
@@ -372,4 +399,59 @@ export function upsertCustomerAnswers(authHeader, params) {
   .catch(err => {
     console.log(err, "err");
   });
+}
+
+export function get_calls(authHeader, payload) {
+  console.log(authHeader,payload)
+  return apiCall(endpoint_url["GetCalls"], "GET", payload, authHeader)
+    .then(response => {
+      return parseCSV(response);
+    })
+    .catch(err => {
+      console.log(err, "err");
+    });
+}
+
+export function ArrangeCalls(Calls)
+{
+  let ManagedCalls=[]
+  let Buffer = 0
+  Calls.forEach((element,index) => {
+
+     if(Buffer === 0)
+     {
+      if(element.TotalLegs === "1")
+      {
+          let SingleLeggedCall={
+              Index:index,
+              Legs:[
+                  element
+              ]
+          }
+          ManagedCalls.push(SingleLeggedCall)
+      }
+      else
+      {
+          let TotalLegs=parseInt(element.TotalLegs)
+          Buffer=element.TotalLegs - 1
+          let MultiLegs=[]
+          for(let i = 0;i < TotalLegs;i++)
+          {
+              MultiLegs.push(Calls[index+i])
+          }
+          let MultiLeggedCall={
+           Index:index,
+           Legs:MultiLegs
+           
+       }
+       ManagedCalls.push(MultiLeggedCall)
+      }
+     }
+     else
+     {
+         Buffer=Buffer-1
+     }  
+ });
+
+ return ManagedCalls
 }
