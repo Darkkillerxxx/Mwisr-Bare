@@ -28,7 +28,8 @@ class CustomDrawer extends React.Component{
                     Icon:"dropbox",
                     SubContents:[
                         {
-                            Name:"Add Packages"
+                            Key:'ViewPackage',
+                            Name:"View Packages"
                         },
                         {
                             Name:"Assign Packages"
@@ -205,8 +206,10 @@ class CustomDrawer extends React.Component{
                     {data.Expanded ? 
                         data.SubContents.map((data,index)=>{
                             return(
-                                <View style={{width:'80%',alignItems:'flex-end'}}>
-                                    <NormalText style={{color:'white',fontSize:14,textAlign:'left'}}>{data.Name}</NormalText>
+                                <View key={index} style={{width:'80%',alignItems:'flex-end'}}>
+                                    <TouchableOpacity onPress={()=>data.Key !== undefined ? this.props.navigation.navigate(data.Key):null}>
+                                        <NormalText style={{color:'white',fontSize:14,textAlign:'left'}}>{data.Name}</NormalText>
+                                    </TouchableOpacity>
                                 </View>
                             )
                         })
