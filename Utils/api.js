@@ -23,6 +23,7 @@ const endpoint_url={
     UpsertCustomerAnswers:base_url_Mwisr+"AnalystRegistration/UpsertCustomerAnswers",
     GetUserPhoto:base_url_Mwisr+"Analyst/GetUserPhoto",
     GetCalls: base_url_wealthyFox+"RTTracker/GetCalls/",
+    GetPackages:base_url_wealthyFox + "/AnalystQuery/GetPackageList",
 }
 
 /********* Normal Functions **********/
@@ -537,6 +538,31 @@ export function get_calls(authHeader, payload) {
   return apiCall(endpoint_url["GetCalls"], "GET", payload, authHeader)
     .then(response => {
       return parseCSV(response);
+    })
+    .catch(err => {
+      console.log(err, "err");
+    });
+}
+
+export function get_packages(body) {
+  const { forOwnerId,userTypeId, assignedToMe, forUserId, AuthHeader, createdByMe,currentPage,pageSize,forDebug} = body;
+  return apiCall(
+    endpoint_url["GetPackages"],
+    "GET",
+    {
+      forOwnerId,
+      userTypeId,
+      assignedToMe,
+      forUserId,
+      createdByMe,
+      currentPage,
+      pageSize,
+      forDebug
+    },
+    AuthHeader
+  )
+    .then(response => {
+      return JSON.parse(response);
     })
     .catch(err => {
       console.log(err, "err");
