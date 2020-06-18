@@ -25,6 +25,137 @@ const endpoint_url={
     GetCalls: base_url_wealthyFox+"RTTracker/GetCalls/",
 }
 
+/********* Normal Functions **********/
+export function ArrangeCalls(Calls,PageSize)
+{
+  let ManagedCalls=[]
+  let Buffer = 0
+  let rowCount=0
+  Calls.forEach((element,index) => {
+    // console.log(parseInt(element.TotalLegs),Calls.length - index)
+     if(Buffer === 0)
+     {
+      if(element.TotalLegs === "1")
+      {
+          let SingleLeggedCall={
+              Index:index,
+              Legs:[
+                  element
+              ]
+          }
+          ManagedCalls.push(SingleLeggedCall)
+          rowCount=rowCount+1
+      }
+      else
+      {        
+          let TotalLegs=parseInt(element.TotalLegs)
+          console.log(index,TotalLegs)
+          console.log(Calls.length,index+TotalLegs)
+          if(PageSize > index+TotalLegs)
+          {
+            Buffer=element.TotalLegs - 1
+            let MultiLegs=[]
+            for(let i = 0;i < TotalLegs;i++)
+            {
+                MultiLegs.push(Calls[index+i])
+            }
+            let MultiLeggedCall={
+             Index:index,
+             Legs:MultiLegs
+            }
+            ManagedCalls.push(MultiLeggedCall)
+          }
+      }
+     }
+     else
+     {
+         Buffer=Buffer-1
+     }  
+ });
+
+ return ManagedCalls
+}
+
+
+export function formatDate(date){
+  date=date.split(' ')
+  let dateArray=date[0].split('/')
+  let months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+  return `${dateArray[1]}-${months[dateArray[0]]}-${dateArray[2]}`
+
+}
+
+export let getPackageBackColor=(segment)=>{
+  if(segment === "Equity")
+  {
+    return "#D9F4F4"
+  }
+  else if(segment === "EquityOptions")
+  {
+    return "#cab7dd"
+  }
+  else if(segment === "EquityFutures")
+  {
+    return "#fff6da"
+  }
+  else if(segment === "CommodityFutures")
+  {
+    return "#E0F8FB"
+  }
+  else if(segment === "CommodityOptions")
+  {
+    return "#FFEAED"
+  }
+  else if(segment === "CurrencyFutures")
+  {
+    return "#e4e4e4"
+  }
+  else if(segment === "CurrencyOptions")
+  {
+    return "#cfd8dc"
+  }
+}
+//Equity-90ee90
+//EquityOptions-b48fd9-6c5682
+//EquityFutures-#FEECB3-orange
+//Commodity Futures-#BBDEFA-blue
+//Commodity Options-#FA8072-red
+//Currency Futures-90a4ae-#455a64
+//Currency Options-cfd8dc-455a64
+export let getPackageFontColor=(segment)=>{
+  if(segment === "Equity")
+  {
+    return "#33C4C6"
+  }
+  else if(segment === "EquityOptions")
+  {
+    return "#6c5682"
+  }
+  else if(segment === "EquityFutures")
+  {
+    return "orange"
+  }
+  else if(segment === "CommodityFutures")
+  {
+    return "#35D0E4"
+  }
+  else if(segment === "CommodityOptions")
+  {
+    return "#FF7588"
+  }
+  else if(segment === "CurrencyFutures")
+  {
+    return "#455a64"
+  }
+  else if(segment === "CurrencyOptions")
+  {
+    return "#455a64"
+  }
+}
+/**********Normal Functions Ends Here ******/
+
+
 const headers = {
     Accept: "*/*",
     "Access-Control-Allow-Origin": "*",
@@ -412,46 +543,3 @@ export function get_calls(authHeader, payload) {
     });
 }
 
-export function ArrangeCalls(Calls)
-{
-  let ManagedCalls=[]
-  let Buffer = 0
-  Calls.forEach((element,index) => {
-
-     if(Buffer === 0)
-     {
-      if(element.TotalLegs === "1")
-      {
-          let SingleLeggedCall={
-              Index:index,
-              Legs:[
-                  element
-              ]
-          }
-          ManagedCalls.push(SingleLeggedCall)
-      }
-      else
-      {
-          let TotalLegs=parseInt(element.TotalLegs)
-          Buffer=element.TotalLegs - 1
-          let MultiLegs=[]
-          for(let i = 0;i < TotalLegs;i++)
-          {
-              MultiLegs.push(Calls[index+i])
-          }
-          let MultiLeggedCall={
-           Index:index,
-           Legs:MultiLegs
-           
-       }
-       ManagedCalls.push(MultiLeggedCall)
-      }
-     }
-     else
-     {
-         Buffer=Buffer-1
-     }  
- });
-
- return ManagedCalls
-}
