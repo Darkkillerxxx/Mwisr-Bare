@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StyleSheet,TouchableOpacity,FlatList } from 'react-native';
+import { View, StyleSheet,TouchableOpacity,FlatList,ActivityIndicator,Image } from 'react-native';
 import { connect }from 'react-redux'
 import Container from '../../Components/Container';
 import NormalText from '../../Components/NormalText';
@@ -7,134 +7,132 @@ import Card from '../../Components/Card';
 import {FontAwesome}  from '@expo/vector-icons';
 import * as Progress from 'react-native-progress'; 
 import {get_packages,getPackageBackColor,getPackageFontColor} from '../../Utils/api'
+import Packages from '../../Components/Pacakges'
+import { enableScreens } from 'react-native-screens';
 
 class ViewPackages extends React.Component{
     constructor()
     {
         super();
         this.state={
-            SelectedTab:"",
-            ReceivedPacakgeList:[]
-        }
-    }
-
-    getPackages(forOwnerId,userTypeId, assignedToMe, forUserId ,createdByMe) {
-        const { AuthHeader } = this.props.loginState;
-        // console.log("23 View Packages",AuthHeader)
-        // this.setState({ loading: true });
-        get_packages({
-          forOwnerId,
-          userTypeId,
-          AuthHeader,
-          forUserId: "",
-          assignedToMe,
-          createdByMe: createdByMe,
-          currentPage:1,
-          pageSize:100,
-          forDebug:false
-        }).then(data => {
-            if(data.IsSuccess)
+            SelectedTab:1,
+            ReceivedPacakgeList:[],
+            isLoading:false,
+            ShowFilters:false,
+            Segments:[
             {
-                this.setState({ReceivedPacakgeList:data.Data},()=>{
-                    console.log(this.state.ReceivedPacakgeList)
-                })
+                "SegmentId": 13,
+                "SegmentName": "All",
+                "Show":true
+            },
+            {
+                "SegmentId": 1,
+                "SegmentName": "Equity",
+                "Show":false
+            },
+            {
+                "SegmentId": 10,
+                "SegmentName": "Equity Futures",
+                "Show":false
+            },
+            {
+                "SegmentId": 9,
+                "SegmentName": "Equity Options",
+                "Show":false
+            },
+            {
+                "SegmentId": 4,
+                "SegmentName": "Currency Futures",
+                "Show":false
+            },
+            {
+                "SegmentId": 12,
+                "SegmentName": "Currency Options",
+                "Show":false
+            },
+            {
+                "SegmentId": 2,
+                "SegmentName": "Commodity Futures",
+                "Show":false
+            },
+            {
+                "SegmentId": 11,
+                "SegmentName": "Commodity Options",
+                "Show":false
             }
-        });
-      }
+          ]
+        }
+    }  
 
-    componentDidMount() {
-        this.getPackages("","",this.props.loginState.UserTypeId === 7 ? true:"",this.props.loginState.UserId,this.props.loginState.UserTypeId === 7 ? "":true);
-      }
-
-    SelectTab=(Tab)=>{
+ 
+    ChangeTabs=(Tab)=>{
         this.setState({SelectedTab:Tab})
-    }
-
-    PacakgeList=(itemData)=>{
-        return(
-            <Card style={styles.PackageCard}>
-                <View style={{...styles.PackageTopContainer,...{backgroundColor:getPackageBackColor(itemData.item.PackageTypeName)}}}>
-                    <View style={styles.PackageTopLeft}>
-                        <FontAwesome name="dropbox" size={38} color={getPackageFontColor(itemData.item.PackageTypeName)} />
-                        <NormalText style={{color:`${getPackageFontColor(itemData.item.PackageTypeName)}`,marginBottom:0}}>Created By</NormalText>
-                        <NormalText style={{color:`${getPackageFontColor(itemData.item.PackageTypeName)}`}}>{itemData.item.DelegatedUserName}</NormalText>
-                    </View>
-                    <View style={styles.PackageTopRight}>
-                        <NormalText style={{color:`${getPackageFontColor(itemData.item.PackageTypeName)}`,marginBottom:0}}>{itemData.item.PackageName}</NormalText>
-                        <NormalText style={{color:`${getPackageFontColor(itemData.item.PackageTypeName)}`,marginBottom:0}}>{itemData.item.Profit} ₹</NormalText>
-                        <NormalText style={{color:`${getPackageFontColor(itemData.item.PackageTypeName)}`,marginBottom:0}}>{itemData.item.PackageTypeName}</NormalText>
-                    </View>
-                </View>
-                <View style={styles.PackageMidContainer}>
-                    <View style={styles.PacakgeMidLeft}>
-                        <NormalText style={{marginBottom:0}}>Total Calls</NormalText>
-                        <NormalText style={{marginBottom:0}}>{itemData.item.TotalCalls}</NormalText>
-                    </View>
-                    <View style={styles.PackageMidRight}>
-                        <NormalText style={{marginBottom:0}}>Total ROI</NormalText>
-                        <NormalText style={{marginBottom:0}}>{itemData.item.AvgROI} %</NormalText>
-                    </View>
-                </View>
-                <View style={styles.PackageBottomContainer}>
-                    <View style={styles.PacakgeBottomLeft}>
-                        <View style={styles.PacakgeBottomLeftLeft}>
-                            <NormalText style={{marginBottom:0}}>Risk</NormalText>
-                            <NormalText style={{marginBottom:0}}>{itemData.item.RiskAvg}</NormalText>
-                        </View>
-                        <View style={styles.PacakgeBottomRightRight}>
-                            <NormalText style={{marginBottom:0}}>Reward</NormalText>
-                            <NormalText style={{marginBottom:0}}>{itemData.item.RewardAvg}</NormalText>
-                        </View>
-                    </View>
-                    <View style={styles.PacakgeBottomRightRight}>
-                        <View style={{width:'100%',flexDirection:'row',justifyContent:'space-between',paddingHorizontal:5}}>
-                            <NormalText style={{marginBottom:5}}>Accuracy</NormalText>
-                            <NormalText style={{marginBottom:5}}>{itemData.item.Accuracy} %</NormalText>
-                        </View>
-                        <Progress.Bar progress={itemData.item.Accuracy / 100} />
-                    </View>
-                </View>
-            </Card>
-        )
-    }
+        // if(Tab === 1)
+        // {
+        //   this.setState({SelectedTab:1})
+        //   this.setState({ isloading: true });
+        //   this.getPackages("","", "","",true);
+        // }
+        // else if(Tab === 2)
+        // {
+        //   this.setState({SelectedTab:2})
+        //   this.setState({ isloading: true });
+        //   this.getPackages("","2", "","",true);
+        // }
+        // else if(Tab === 3)
+        // {
+        //   this.setState({SelectedTab:3})
+        //   this.setState({ isloading: true });
+        //   this.getPackages("","6", "","",true);
+        // }
+        // else if(Tab === 4)
+        // {
+        //   this.setState({SelectedTab:4})
+        //   this.setState({ isloading: true });
+        //   this.getPackages("","5", "","",true);
+        // }
+        // else if(Tab === 5)
+        // {
+        //   this.setState({SelectedTab:5})
+        //   this.setState({ isloading: true });
+        //   this.getPackages("","", true,"","");
+        // }
+      }
 
     render()
     {
         return(
             <Container style={styles.ViewPackageContainer}>
                 <View style={styles.TabContainer}>
-                    <View style={this.state.SelectedTab === "" ? styles.TabsSelected:styles.Tabs}>
-                        <TouchableOpacity onPress={()=>this.SelectTab("")}>
+                    <View style={this.state.SelectedTab === 1 ? styles.TabsSelected:styles.Tabs}>
+                        <TouchableOpacity onPress={()=>this.ChangeTabs(1)}>
                             <NormalText style={styles.TabsText}>Own</NormalText>
                         </TouchableOpacity>
                     </View>
-                    <View style={this.state.SelectedTab === "2" ? styles.TabsSelected:styles.Tabs}>
-                        <TouchableOpacity onPress={()=>this.SelectTab("2")}>
+                    <View style={this.state.SelectedTab === 2 ? styles.TabsSelected:styles.Tabs}>
+                        <TouchableOpacity onPress={()=>this.ChangeTabs(2)}>
                             <NormalText style={styles.TabsText}>Sub-Broker</NormalText>
                         </TouchableOpacity>
                     </View>
-                    <View style={this.state.SelectedTab === "6" ? styles.TabsSelected:styles.Tabs}>
-                        <TouchableOpacity onPress={()=>this.SelectTab("6")}>
+                    <View style={this.state.SelectedTab === 3 ? styles.TabsSelected:styles.Tabs}>
+                        <TouchableOpacity onPress={()=>this.ChangeTabs(3)}>
                             <NormalText style={styles.TabsText}>Analyst</NormalText>
                         </TouchableOpacity>
                     </View>
-                     <View style={this.state.SelectedTab === "5" ? styles.TabsSelected:styles.Tabs}>
-                        <TouchableOpacity onPress={()=>this.SelectTab("5")}>
+                     <View style={this.state.SelectedTab === 4 ? styles.TabsSelected:styles.Tabs}>
+                        <TouchableOpacity onPress={()=>this.ChangeTabs(4)}>
                             <NormalText style={styles.TabsText}>Partner</NormalText>
                         </TouchableOpacity>
                     </View>
-                     <View style={this.state.SelectedTab === "7" ? styles.TabsSelected:styles.Tabs}>
-                        <TouchableOpacity onPress={()=>this.SelectTab("7")}>
+                     <View style={this.state.SelectedTab === 5 ? styles.TabsSelected:styles.Tabs}>
+                        <TouchableOpacity onPress={()=>this.ChangeTabs(5)}>
                             <NormalText style={styles.TabsText}>Assigned To Me</NormalText>
                         </TouchableOpacity>
                     </View>
                 </View>
 
                 <View style={styles.PackageContainer}> 
-                   <FlatList 
-                     keyExtractor={(item, index) => item.PackageId.toString()}
-                     data={this.state.ReceivedPacakgeList}
-                     renderItem={this.PacakgeList}/>
+                    <Packages Segments={this.state.Segments} SelectedTab={this.state.SelectedTab} />
                 </View>
             </Container>
         )
@@ -179,7 +177,7 @@ const styles=StyleSheet.create({
         backgroundColor:'#fafafa'
     },
     PackageCard:{
-        width:'97%',
+        width:'98%',
         height:200,
         borderRadius:10,
         alignItems:'flex-start',
@@ -245,6 +243,33 @@ const styles=StyleSheet.create({
         height:'100%',
         alignItems:'center'
     },
+    FilterContainer:{
+        width:'100%',
+        flexDirection:'row',
+        justifyContent:'space-evenly',
+        marginVertical:5
+    },
+    FilterBoxUnSelected:{
+        width:'30%',
+        borderColor:'#0f2346',
+        borderWidth:1,
+        alignItems:'center',
+        justifyContent:'center',
+        padding:5,
+        borderRadius:5,
+        margin:5    
+    },
+    FilterBoxSelected:{
+        width:'30%',
+        borderColor:'#0f2346',
+        backgroundColor:"#0f2346",
+        borderWidth:1,
+        alignItems:'center',
+        justifyContent:'center',
+        padding:5,
+        borderRadius:5,
+        margin:5 
+    }
 })
 
 const mapStateToProps= state =>{
@@ -260,3 +285,87 @@ const mapDispatchToProps = dispatch =>{
 }
 
 export default connect(mapStateToProps,mapDispatchToProps)(ViewPackages);
+
+
+          {/* <View style={{width:'100%',paddingHorizontal:10,marginTop:10}}>
+                    <TouchableOpacity onPress={()=>this.setState({ShowFilters:!this.state.ShowFilters})}>  
+                        <View style={{flexDirection:'row',alignItems:'center',marginBottom:5}}>
+                            <NormalText style={{fontSize:15,marginHorizontal:5,marginBottom:0}}>Filters</NormalText>
+                            {this.state.ShowFilters ? 
+                            <FontAwesome name="caret-up" size={22} color="black" />:
+                            <FontAwesome name="caret-down" size={22} color="black"/> } 
+                        </View>
+                    </TouchableOpacity>
+                    
+                    {this.state.ShowFilters ? 
+                        <FlatList 
+                        keyExtractor={(item,index)=>item.SegmentId.toString()}
+                        data={this.state.Segments}
+                        renderItem={this.showFilterBox}
+                        numColumns={3} />  :null    
+                    }
+                    
+                </View> */}
+
+                   // SelectUnselectFilters=(id)=>{
+    //     let TempSeg=this.state.Segments;
+    //     if(id === 13)
+    //     {
+    //         console.log("Before",TempSeg[0].Show)
+    //         TempSeg[0].Show=!TempSeg[0].Show
+    //         console.log("After",TempSeg[0].Show)
+    //         TempSeg.forEach(element=>{
+    //             if(element.SegmentId !== 13)
+    //             {
+    //                 if(TempSeg[0].Show)
+    //                 {
+    //                     element.Show=false
+    //                 }
+    //                 else
+    //                 {
+    //                     element.Show=true
+    //                 }
+    //             }
+                
+    //         })
+
+    //         this.setState({Segments:TempSeg})
+    //     }
+    //     else
+    //     {
+    //         TempSeg[0].Show=false
+    //         TempSeg.forEach(element=>{
+    //             if(element.SegmentId === id)
+    //             {
+    //                 element.Show = !element.Show
+    //             }
+    //         })
+    //         this.setState({Segments:TempSeg})
+    //     }
+    // }
+
+    // checkSelected=(id)=>{
+    //     let Selected=false
+    //     this.state.Segments.forEach(element => {
+    //         // console.log("127 check filter",id === element.SegmentId)
+    //         if(id === element.SegmentId)
+    //         {
+    //             if(element.Show)
+    //             {
+    //                 Selected=true
+    //             }
+    //         }
+    //     })
+
+    //     return Selected
+    // }
+
+    // showFilterBox=(itemData)=>{
+    //     return(
+    //         <View style={this.checkSelected(itemData.item.SegmentId) ? styles.FilterBoxSelected:styles.FilterBoxUnSelected}>
+    //             <TouchableOpacity onPress={()=>this.SelectUnselectFilters(itemData.item.SegmentId)}>
+    //                 <NormalText style={this.checkSelected(itemData.item.SegmentId) ? {marginBottom:0,color:'white'}:{marginBottom:0}}>{itemData.item.SegmentName}</NormalText>
+    //             </TouchableOpacity>
+    //         </View>
+    //     )
+    // }
