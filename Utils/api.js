@@ -21,8 +21,141 @@ const endpoint_url={
     GetCreditPackages:base_url_wealthyFox + "/UserLicense/GetCreditPackages",
     ApplyCreditPackage:base_url_wealthyFox+"UserLicense/ApplyCreditPackage/",
     UpsertCustomerAnswers:base_url_Mwisr+"AnalystRegistration/UpsertCustomerAnswers",
-    GetUserPhoto:base_url_Mwisr+"Analyst/GetUserPhoto"
+    GetUserPhoto:base_url_Mwisr+"Analyst/GetUserPhoto",
+    GetCalls: base_url_wealthyFox+"RTTracker/GetCalls/",
+    GetPackages:base_url_wealthyFox + "/AnalystQuery/GetPackageList",
 }
+
+/********* Normal Functions **********/
+export function ArrangeCalls(Calls,PageSize)
+{
+  let ManagedCalls=[]
+  let Buffer = 0
+  let rowCount=0
+  Calls.forEach((element,index) => {
+    // console.log(parseInt(element.TotalLegs),Calls.length - index)
+     if(Buffer === 0)
+     {
+      if(element.TotalLegs === "1")
+      {
+          let SingleLeggedCall={
+              Index:index,
+              Legs:[
+                  element
+              ]
+          }
+          ManagedCalls.push(SingleLeggedCall)
+          rowCount=rowCount+1
+      }
+      else
+      {        
+          let TotalLegs=parseInt(element.TotalLegs)
+          console.log(index,TotalLegs)
+          console.log(Calls.length,index+TotalLegs)
+          if(PageSize > index+TotalLegs)
+          {
+            Buffer=element.TotalLegs - 1
+            let MultiLegs=[]
+            for(let i = 0;i < TotalLegs;i++)
+            {
+                MultiLegs.push(Calls[index+i])
+            }
+            let MultiLeggedCall={
+             Index:index,
+             Legs:MultiLegs
+            }
+            ManagedCalls.push(MultiLeggedCall)
+          }
+      }
+     }
+     else
+     {
+         Buffer=Buffer-1
+     }  
+ });
+
+ return ManagedCalls
+}
+
+
+export function formatDate(date){
+  date=date.split(' ')
+  let dateArray=date[0].split('/')
+  let months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+  return `${dateArray[1]}-${months[dateArray[0]]}-${dateArray[2]}`
+
+}
+
+export let getPackageBackColor=(segment)=>{
+  if(segment === "Equity")
+  {
+    return "#D9F4F4"
+  }
+  else if(segment === "EquityOptions")
+  {
+    return "#cab7dd"
+  }
+  else if(segment === "EquityFutures")
+  {
+    return "#fff6da"
+  }
+  else if(segment === "CommodityFutures")
+  {
+    return "#E0F8FB"
+  }
+  else if(segment === "CommodityOptions")
+  {
+    return "#FFEAED"
+  }
+  else if(segment === "CurrencyFutures")
+  {
+    return "#e4e4e4"
+  }
+  else if(segment === "CurrencyOptions")
+  {
+    return "#cfd8dc"
+  }
+}
+//Equity-90ee90
+//EquityOptions-b48fd9-6c5682
+//EquityFutures-#FEECB3-orange
+//Commodity Futures-#BBDEFA-blue
+//Commodity Options-#FA8072-red
+//Currency Futures-90a4ae-#455a64
+//Currency Options-cfd8dc-455a64
+export let getPackageFontColor=(segment)=>{
+  if(segment === "Equity")
+  {
+    return "#33C4C6"
+  }
+  else if(segment === "EquityOptions")
+  {
+    return "#6c5682"
+  }
+  else if(segment === "EquityFutures")
+  {
+    return "orange"
+  }
+  else if(segment === "CommodityFutures")
+  {
+    return "#35D0E4"
+  }
+  else if(segment === "CommodityOptions")
+  {
+    return "#FF7588"
+  }
+  else if(segment === "CurrencyFutures")
+  {
+    return "#455a64"
+  }
+  else if(segment === "CurrencyOptions")
+  {
+    return "#455a64"
+  }
+}
+/**********Normal Functions Ends Here ******/
+
 
 const headers = {
     Accept: "*/*",
@@ -49,6 +182,7 @@ const headers = {
      .filter(x=>x[0])
      .reduce((ac, x)=>{ac[x[0]] = x[1];return ac;}, {});
   }
+  
 
   function createGETParams(params) {
     if (Object.keys(params).length === 0) return "";
@@ -84,6 +218,34 @@ const headers = {
       Text.Encoding.Unicode.GetBytes(encryptedBase64)
     );
   }
+
+  
+function parseCSV(csvString) {
+  csvString = csvString.replace(/"/g, "");
+
+  var lines = csvString.split("\\r\\n");
+
+  // console.log("lines", lines);
+
+  lines.map((line, i) => {
+    // console.log(i);
+    // console.log(line);
+    lines[i] = line.split(",");
+  });
+
+  var parsedCSV = [];
+  for (var i = 1; i < lines.length; i++) {
+    var obj = {};
+
+    for (var j = 0; j < lines[0].length; j++) {
+      obj[lines[0][j]] = lines[i][j];
+    }
+
+    parsedCSV.push(obj);
+  }
+  parsedCSV.pop();
+  return parsedCSV;
+}
 
  
   export function CheckWhereToGo(location){
@@ -125,9 +287,6 @@ const headers = {
 }
 
 export function send_OTP(UserId,authHeader) {
-  // console.log("426",emailId)
-  // console.log(password, phno);
-  // let authHeader = GetAuthHeader(emailId, password,phno);
   const data = {
     AnalystId: UserId
   };
@@ -373,3 +532,40 @@ export function upsertCustomerAnswers(authHeader, params) {
     console.log(err, "err");
   });
 }
+
+export function get_calls(authHeader, payload) {
+  console.log(authHeader,payload)
+  return apiCall(endpoint_url["GetCalls"], "GET", payload, authHeader)
+    .then(response => {
+      return parseCSV(response);
+    })
+    .catch(err => {
+      console.log(err, "err");
+    });
+}
+
+export function get_packages(body) {
+  const { forOwnerId,userTypeId, assignedToMe, forUserId, AuthHeader, createdByMe,currentPage,pageSize,forDebug} = body;
+  return apiCall(
+    endpoint_url["GetPackages"],
+    "GET",
+    {
+      forOwnerId,
+      userTypeId,
+      assignedToMe,
+      forUserId,
+      createdByMe,
+      currentPage,
+      pageSize,
+      forDebug
+    },
+    AuthHeader
+  )
+    .then(response => {
+      return JSON.parse(response);
+    })
+    .catch(err => {
+      console.log(err, "err");
+    });
+}
+

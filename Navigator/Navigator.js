@@ -10,18 +10,52 @@ import OTP from '../Screens/OTP/OTP'
 import Onboarding from '../Screens/Onboarding/Onboarding'
 import AddCall from '../Screens/Calls/AddCall'
 import AddPackage from '../Screens/Package/AddPackage'
+import ViewPackage from '../Screens/Package/ViewPackages'
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import CustomDrawer from '../Components/CustomDrawer'
 
 const Drawer=createDrawerNavigator({
-    Home:{
-        screen:Home,
-    },
+    Home:createBottomTabNavigator({
+            Home:{
+                screen:Home,
+                navigationOptions:{
+                    tabBarIcon:(tabIcon)=>{
+                        return <FontAwesome name="home" size={25} color={tabIcon.tintColor} />
+                    }
+                }
+            },
+            AddCall:{
+                screen:AddCall,
+                navigationOptions:{
+                    tabBarLabel:'Add Call',
+                    tabBarIcon:(tabIcon)=>{
+                        return <FontAwesome name="phone" size={25} color={tabIcon.tintColor} />
+                    }
+                }
+            },
+            AddPackage:{
+                screen:AddPackage,
+                navigationOptions:{
+                    tabBarLabel:'Add Package',
+                    tabBarIcon:(tabIcon)=>{
+                        return <FontAwesome name="dropbox" size={25} color={tabIcon.tintColor} />
+                    }
+                }
+            }
+        },{
+            tabBarOptions:{
+                activeTintColor:"#f5bb18"
+            }
+        }),
+
     Package:{
         screen:AddPackage
     },
     Call:{
         screen:AddCall
+    },
+    ViewPackage:{
+        screen:ViewPackage
     }
 },{
     contentComponent:CustomDrawer,
@@ -46,38 +80,9 @@ const MwisrNavigation=createSwitchNavigator({
     },{
         headerMode:"none"
     }),
-    ProDB:createBottomTabNavigator({
-        Home:{
-            screen:Drawer,
-            navigationOptions:{
-                tabBarIcon:(tabIcon)=>{
-                    return <FontAwesome name="home" size={25} color={tabIcon.tintColor} />
-                }
-            }
-        },
-        AddCall:{
-            screen:AddCall,
-            navigationOptions:{
-                tabBarLabel:'Add Call',
-                tabBarIcon:(tabIcon)=>{
-                    return <FontAwesome name="phone" size={25} color={tabIcon.tintColor} />
-                }
-            }
-        },
-        AddPackage:{
-            screen:AddPackage,
-            navigationOptions:{
-                tabBarLabel:'Add Package',
-                tabBarIcon:(tabIcon)=>{
-                    return <FontAwesome name="dropbox" size={25} color={tabIcon.tintColor} />
-                }
-            }
-        }
-    },{
-        tabBarOptions:{
-            activeTintColor:"#f5bb18"
-        }
-    })
+    ProDB:Drawer
+    
+    
 
 })
 
