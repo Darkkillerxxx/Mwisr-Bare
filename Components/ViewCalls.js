@@ -25,6 +25,14 @@ class ViewCalls extends React.Component{
         // },10000)
     }
 
+    componentDidUpdate(prevProps,prevState,Ss)
+    {
+        if(prevProps.STab !== this.props.STab)
+        {
+            this.getCalls(1,"",true)
+        }
+    }
+
     getCalls(pageNo,type,firstload = "false",showActive = "true") {
         if(firstload)
         {
