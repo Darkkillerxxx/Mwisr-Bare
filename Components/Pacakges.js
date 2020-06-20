@@ -11,7 +11,7 @@ import Card from '../Components/Card'
 class Packages extends React.Component{
     constructor()
     {
-        super()
+        super();
         this.state={
             ReceivedPacakgeList:[],
             isLoading:false
@@ -45,6 +45,39 @@ class Packages extends React.Component{
     componentDidMount() 
     {
         this.getPackages("","",this.props.loginState.UserTypeId === 7 ? true:"",this.props.loginState.UserId,this.props.loginState.UserTypeId === 7 ? "":true);
+    }
+
+    componentDidUpdate(prevProps,prevState,ss)
+    {
+        if(prevProps.SelectedTab !== this.props.SelectedTab)
+        {
+            console.log("Props Change")
+            if(this.props.SelectedTab === 1)
+            {
+            this.setState({ isloading: true });
+            this.getPackages("","", "","",true);
+            }
+            else if(this.props.SelectedTab === 2)
+            {
+            this.setState({ isloading: true });
+            this.getPackages("","2", "","",true);
+            }
+            else if(this.props.SelectedTab === 3)
+            {
+            this.setState({ isloading: true });
+            this.getPackages("","6", "","",true);
+            }
+            else if(this.props.SelectedTab === 4)
+            {
+            this.setState({ isloading: true });
+            this.getPackages("","5", "","",true);
+            }
+            else if(this.props.SelectedTab === 5)
+            {
+            this.setState({ isloading: true });
+            this.getPackages("","", true,"","");
+            }
+        }
     }
 
     checkSelected=(id)=>{
