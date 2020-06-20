@@ -13,6 +13,10 @@ import AddPackage from '../Screens/Package/AddPackage'
 import ViewPackage from '../Screens/Package/ViewPackages'
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import CustomDrawer from '../Components/CustomDrawer'
+import Sub from '../Screens/Users/Sub'
+import Analyst from '../Screens/Users/Analyst'
+import Partner from '../Screens/Users/Partner'
+import { sub } from 'react-native-reanimated';
 
 const Drawer=createDrawerNavigator({
     Home:createBottomTabNavigator({
@@ -56,6 +60,15 @@ const Drawer=createDrawerNavigator({
     },
     ViewPackage:{
         screen:ViewPackage
+    },
+    Sub:{
+        screen:Sub
+    },
+    Analyst:{
+        screen:Analyst
+    },
+    Partner:{
+        screen:Partner
     }
 },{
     contentComponent:CustomDrawer,
@@ -81,9 +94,6 @@ const MwisrNavigation=createSwitchNavigator({
         headerMode:"none"
     }),
     ProDB:Drawer
-    
-    
-
 })
 
 
