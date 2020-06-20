@@ -43,12 +43,15 @@ class CustomDrawer extends React.Component{
                     Icon:"users",
                     SubContents:[
                         {
+                            Key:"Sub",
                             Name:"Sub-Broker List"
                         },
                         {
+                            Key:"Analyst",
                             Name:"Analyst List"
                         },
                         {
+                            Key:"Partner",
                             Name:"Partner List"
                         },
                         {
