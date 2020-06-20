@@ -24,6 +24,7 @@ const endpoint_url={
     GetUserPhoto:base_url_Mwisr+"Analyst/GetUserPhoto",
     GetCalls: base_url_wealthyFox+"RTTracker/GetCalls/",
     GetPackages:base_url_wealthyFox + "/AnalystQuery/GetPackageList",
+    GetSubList: base_url_wealthyFox+"MwisrQueries/GetSub/"
 }
 
 /********* Normal Functions **********/
@@ -567,5 +568,22 @@ export function get_packages(body) {
     .catch(err => {
       console.log(err, "err");
     });
+}
+
+export function get_sub_list(userId,listType,IsBase,authHeader) {
+  const payload = {
+    ForUserId:null,
+    ForUserTypeId: listType,
+    ForOwnerId:null,
+    PackageNameSize:10,
+    IsBaseLevel:IsBase
+  };
+  console.log(payload,authHeader)
+
+  return apiCall(endpoint_url["GetSubList"], "POST", payload, authHeader)
+    .then(data => {
+      return JSON.parse(data)
+    })
+    .catch(err => err);
 }
 
