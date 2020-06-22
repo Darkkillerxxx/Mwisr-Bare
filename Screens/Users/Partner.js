@@ -18,7 +18,7 @@ class Partner extends React.Component{
     {
         return(
             <Container style={styles.SubContainer}>
-                <Users UserType={5} AuthHeader={this.props.loginState.AuthHeader}/>
+                <Users UserColor="#f39834" UserType={5} AuthHeader={this.props.loginState.AuthHeader}/>
             </Container>
         )
     }

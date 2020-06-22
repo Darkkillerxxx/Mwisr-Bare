@@ -18,7 +18,7 @@ class Analyst extends React.Component{
     {
         return(
             <Container style={styles.SubContainer}>
-                <Users UserType={6} AuthHeader={this.props.loginState.AuthHeader}/>
+                <Users UserColor="#1890ff" UserType={6} AuthHeader={this.props.loginState.AuthHeader}/>
             </Container>
         )
     }
