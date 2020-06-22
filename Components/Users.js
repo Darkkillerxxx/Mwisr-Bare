@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text,View, StyleSheet, Image,FlatList,Modal } from 'react-native'
+import { Text,View, StyleSheet, Image,FlatList,Modal,ActivityIndicator} from 'react-native'
 import Card from './Card'
 import BoldText from './BoldText'
 import NormalText from './NormalText'
@@ -16,26 +16,97 @@ class Users extends React.Component{
         super()
         this.state={
             RecivedUserList:[],
-            ShowFilters:false
+            ShowFilters:false,
+            isLoading:false,
+            Filter:{
+                AccuracyFilter:null,
+                ProfitFilter:null,
+                ROIFilter:null
+            }
         }
     }
 
     componentDidMount()
-    {
+    {   
+        this.setState({isLoading:true})
         get_sub_list(null,this.props.UserType,true,this.props.AuthHeader).then(result=>{
             if(result.IsSuccess)
             {
-                this.setState({RecivedUserList:result.Data})
+                this.setState({RecivedUserList:result.Data},()=>{
+                    this.setState({isLoading:false})
+                })
             }
         })
     }
 
+    ApplyFilter=(filter)=>{
+        this.setState({ShowFilters:false})
+        this.setState({Filter:filter})
+    }
+
+    CheckProfitFilter=(user)=>{
+        let ProfitFilter= this.state.Filter.ProfitFilter === null ? null:this.state.Filter.ProfitFilter.split(',')
+        if(ProfitFilter !== null)
+        {
+            if(parseInt(user.ProfitPerInvestment) >= parseInt(ProfitFilter[0]) && parseInt(user.ProfitPerInvestment) <= parseInt(ProfitFilter[1]))
+            {
+                return true
+            }
+            else
+            {
+                return false
+            }
+        }
+        else
+        {
+            return true
+        }
+    }
+
+    CheckAccuracyFilter=(user)=>{
+        // console.log("48",this.state.Filter)
+        let AccuracyFilter= this.state.Filter.AccuracyFilter === null ? null:this.state.Filter.AccuracyFilter.split(',')
+        if(AccuracyFilter !== null)
+        {
+            // console.log("52",AccuracyFilter)
+            if(parseInt(user.Accuracy) >= parseInt(AccuracyFilter[0]) && parseInt(user.Accuracy) <= parseInt(AccuracyFilter[1]))
+            {
+                return true
+            }
+            else
+            {
+                return false
+            }
+        }
+        else
+        {
+            return true
+        }
+         
+    }
+
+    CheckCardsDisplay=(user)=>{
+        if(this.CheckAccuracyFilter(user))
+        {
+            if(this.CheckProfitFilter(user))
+            {
+                return true
+            }
+        }
+        else
+        {
+            return false
+        }
+    }
+
     ShowCards=(itemData)=>(
+        this.CheckCardsDisplay(itemData.item) ?
+
          <Card style={styles.UserCard}>
                     <View style={styles.CardLeftContainer}>
                         <View>
                             <View>
-                                <NormalText style={{...styles.AccuracyNo,...{backgroundColor:'#16d39a'}}}>{parseInt(itemData.item.Accuracy)}</NormalText>
+                                <NormalText style={{...styles.AccuracyNo,...{backgroundColor:this.props.UserColor}}}>{parseInt(itemData.item.Accuracy)}</NormalText>
                             </View>
                             
                             <AnimatedCircularProgress
@@ -43,7 +114,7 @@ class Users extends React.Component{
                                 width={5}
                                 fill={itemData.item.Accuracy}
                                 tintColor={this.props.UserColor}
-                                onAnimationComplete={() => console.log('onAnimationComplete')}
+                                onAnimationComplete={() =>{}}
                                 backgroundColor="white"
                                 rotation={180}>
                                     {
@@ -52,7 +123,7 @@ class Users extends React.Component{
                                         )
                                     }
                             </AnimatedCircularProgress>
-                            <NormalText style={{...styles.AccuracyText,...{backgroundColor:'#16d39a'}}}>Accuracy</NormalText>
+                            <NormalText style={{...styles.AccuracyText,...{backgroundColor:this.props.UserColor}}}>Accuracy</NormalText>
                         </View>
                   
                     </View> 
@@ -101,11 +172,12 @@ class Users extends React.Component{
                             </View>
                         </View>
                     </View>               
-                </Card>
+                </Card>:null
     )
 
     render()
     {
+        console.log(this.state.Filter)
         return(
             <View style={styles.UserContainer}>
                <View style={{width:'100%',height:50,alignItems:'flex-end',paddingHorizontal:10,justifyContent:'flex-end'}}>
@@ -116,13 +188,24 @@ class Users extends React.Component{
                         </View> 
                     </TouchableOpacity>
                </View>
-               <FlatList 
-                    keyExtractor={(item,data) => item.UserId.toString()}
-                    data={this.state.RecivedUserList}
-                    renderItem={this.ShowCards} />
+               
+               { !this.state.isLoading ? 
+                        <FlatList 
+                           keyExtractor={(item,data) => item.UserId.toString()}
+                           data={this.state.RecivedUserList}
+                           renderItem={this.ShowCards} />:
+
+                         <View style={{flex:1,alignSelf:'stretch',alignItems:'center',justifyContent:'center'}}>
+                             <ActivityIndicator size="large" color={this.props.UserColor} />
+                        </View>  
+                        
+
+                }
+
+            
 
                 <Modal visible={this.state.ShowFilters} animationType="slide" transparent={true}>
-                    <UserFilter UserColor={this.props.UserColor} />
+                    <UserFilter UserColor={this.props.UserColor} AppliedFilter={this.ApplyFilter} />
                 </Modal>
             </View>
         )

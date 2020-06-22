@@ -6,6 +6,7 @@ import { connect }from 'react-redux'
 import NormalText from './NormalText'
 import {FontAwesome}  from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import {setRoute} from '../store/Actions/ActionLogin'
 
 class CustomDrawer extends React.Component{
     constructor()
@@ -166,6 +167,7 @@ class CustomDrawer extends React.Component{
     componentDidMount()
     {
         const {AuthHeader}=this.props.loginState
+        console.log("Route State",this.props.routeState)
         get_user_photo(AuthHeader).then(result=>{
             if(result.IsSuccess)
             {
@@ -179,6 +181,11 @@ class CustomDrawer extends React.Component{
         let TempMenuContents=this.state.MenuContents;
         TempMenuContents[index].Expanded = !TempMenuContents[index].Expanded
         this.setState({MenuContent:TempMenuContents})
+    }
+
+    NavigateToRoute=(Route)=>{
+        this.props.onSetRoute(Route)
+        this.props.navigation.navigate(Route)
     }
 
 
@@ -210,8 +217,12 @@ class CustomDrawer extends React.Component{
                         data.SubContents.map((data,index)=>{
                             return(
                                 <View key={index} style={{width:'80%',alignItems:'flex-end'}}>
-                                    <TouchableOpacity onPress={()=>data.Key !== undefined ? this.props.navigation.navigate(data.Key):null}>
-                                        <NormalText style={{color:'white',fontSize:14,textAlign:'left'}}>{data.Name}</NormalText>
+                                    <TouchableOpacity onPress={()=>{
+                                        data.Key !== undefined ? 
+                                        this.NavigateToRoute(data.Key)
+                                        :null
+                                        }}>
+                                        <NormalText style={{color:`${this.props.routeState === data.Key ? "yellow":"white"}`,fontSize:14,textAlign:'left'}}>{data.Name}</NormalText>
                                     </TouchableOpacity>
                                 </View>
                             )
@@ -264,13 +275,15 @@ const styles=StyleSheet.create({
 
 const mapStateToProps= state =>{
     return{
-        loginState:state.login.login
+        loginState:state.login.login,
+        routeState:state.login.RouteName
     }
 }
 
 const mapDispatchToProps = dispatch =>{
     return{
-        onSetLogin:(response)=>dispatch(setLogin(response))
+        onSetLogin:(response)=>dispatch(setLogin(response)),
+        onSetRoute:(response)=>dispatch(setRoute(response))
     }
 }
 
