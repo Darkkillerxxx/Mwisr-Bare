@@ -11,6 +11,7 @@ import NormalText from '../../Components/NormalText.js';
 import RBContainer from '../../Components/RBContainer.js';
 import CustomButton from '../../Components/Button.js';
 import { FlatList } from 'react-native-gesture-handler';
+import RadioBtn from '../../Components/RadioBtn'
 
 const customStyles = {
     stepIndicatorSize: 30,
@@ -116,8 +117,10 @@ class AddPackage extends React.Component{
 
     showSegmentType=(itemData)=>{
         return(
-            <TouchableOpacity style={{width:'45%',marginHorizontal:5,marginVertical:2}}>
-              
+            <TouchableOpacity style={{width:'100%',marginHorizontal:10,marginVertical:2}}>
+                  <RadioBtn>
+                      <NormalText style={{marginBottom:0}}>{itemData.item.SegmentName}</NormalText>
+                  </RadioBtn>
             </TouchableOpacity>
             
         )
@@ -165,10 +168,9 @@ class AddPackage extends React.Component{
                                 keyExtractor={(item, index) => item.SegmentId.toString()}
                                 data={this.state.SegmentType}
                                 renderItem={this.showSegmentType}
-                                numColumns={2}
+                                numColumns={1}
                             />
-                            
-                            
+                              
                         </View>
                     </Card>
                 </View>}
@@ -229,7 +231,7 @@ const style=StyleSheet.create({
     },
     SegmentContainer:{
         width:'100%',
-        alignItems:'center',
+        alignItems:'flex-start',
         justifyContent:'center'
     }
 })
