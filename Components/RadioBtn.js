@@ -12,7 +12,7 @@ class RadioBtn extends React.Component{
         return(
             <View style={style.RBContainer}>
                <View style={style.RadioButtonOuter}>
-                   <View style={style.RBSelected}>
+                   <View style={this.props.Selected ? style.RBSelected:{}}>
                       
                    </View>
                </View>
@@ -28,7 +28,8 @@ const style=StyleSheet.create({
         flexDirection:'row',
         alignItems:'center',
         justifyContent:'flex-start',
-        textAlign:'center'
+        textAlign:'center',
+        marginBottom:5
     },
     RadioButtonOuter:{
         width:15,

@@ -1,5 +1,5 @@
 import React from 'react'
-import { View,Text,AsyncStorage,Picker,StyleSheet,TextInput, TouchableOpacity} from 'react-native';
+import { View,Text,AsyncStorage,Picker,StyleSheet,TextInput, TouchableOpacity,Switch} from 'react-native';
 import { connect }from 'react-redux'
 import {login_call, GetAuthHeader,CheckWhereToGo} from '../../Utils/api.js'
 import {setLogin} from '../../store/Actions/ActionLogin'
@@ -10,8 +10,9 @@ import BoldText from '../../Components/BoldText.js';
 import NormalText from '../../Components/NormalText.js';
 import RBContainer from '../../Components/RBContainer.js';
 import CustomButton from '../../Components/Button.js';
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import RadioBtn from '../../Components/RadioBtn'
+import {get_user_owners,get_strategy} from '../../Utils/api'
 
 const customStyles = {
     stepIndicatorSize: 30,
@@ -43,7 +44,7 @@ class AddPackage extends React.Component{
     {
         super();
         this.state={
-            AddPackageState:1,
+            AddPackageState:0,
             PackageName:"",
             SelectedOwnerId:"",
             ErrorCode:null,
@@ -76,14 +77,87 @@ class AddPackage extends React.Component{
                     "SegmentId": 12,
                     "SegmentName": "CurrencyOptions"
                 }
-            ]
+            ],
+            SelectedSegmentId:1,
+            isPaid:false,
+            PaidList:[{
+                PriceType: "Per Call",
+                B2BPrice: 0,
+                B2CPrice: 0
+              },
+              {
+                PriceType: "Per Day",
+                B2BPrice: 0,
+                B2CPrice: 0
+              },
+              {
+                PriceType: "Per 3 Day",
+                B2BPrice: 0,
+                B2CPrice: 0
+              },
+              {
+                PriceType: "Per 7 Day",
+                B2BPrice: 0,
+                B2CPrice: 0
+              },
+              {
+                PriceType: "Per 15 Day",
+                B2BPrice: 0,
+                B2CPrice: 0
+              },
+              {
+                PriceType: "Per Month",
+                B2BPrice: 0,
+                B2CPrice: 0
+              },
+              {
+                PriceType: "Per 3 Month",
+                B2BPrice: 0,
+                B2CPrice: 0
+              },
+              {
+                PriceType: "Per 6 Month",
+                B2BPrice: 0,
+                B2CPrice: 0
+              },
+              {
+                PriceType: "Per 9 Month",
+                B2BPrice: 0,
+                B2CPrice: 0
+              },
+              {
+                PriceType: "Per Year",
+                B2BPrice: 0,
+                B2CPrice: 0
+              }],
+              UserOwners:[],
+              SelectedUser:null,
+              Strategy:[]
         }
+      
 
     }
 
     componentDidMount()
     {
-        
+        const {AuthHeader} = this.props.loginState
+        get_user_owners(AuthHeader).then(result=>{
+            if(result.IsSuccess)
+            {
+                this.setState({UserOwners:result.Data},()=>{
+                    console.log(this.state.UserOwners)
+                })
+            }
+        })
+
+        get_strategy(AuthHeader).then(result => {
+            if(result.IsSuccess)
+            {
+                this.setState({Strategy:result.Data})
+            }
+        })
+
+
     }
 
     Validation=()=>{
@@ -101,7 +175,11 @@ class AddPackage extends React.Component{
         }
         else if(this.state.AddPackageState === 1)
         {
-            
+           return true 
+        }
+        else if(this.state.AddPackageState === 2)
+        {
+            return true
         }
     }
 
@@ -115,21 +193,64 @@ class AddPackage extends React.Component{
         }
     }
 
-    showSegmentType=(itemData)=>{
-        return(
-            <TouchableOpacity style={{width:'100%',marginHorizontal:10,marginVertical:2}}>
-                  <RadioBtn>
-                      <NormalText style={{marginBottom:0}}>{itemData.item.SegmentName}</NormalText>
-                  </RadioBtn>
-            </TouchableOpacity>
-            
-        )
+    onPriceChange=(index,id,value)=>{
+        let TempPaidPrice=this.state.PaidList
+        if(id === 1)
+        {
+            TempPaidPrice[index].B2BPrice=value
+        }
+        else
+        {
+            TempPaidPrice[index].B2BPrice=value
+        }
+
+        this.setState({PaidList:TempPaidPrice},()=>{
+            console.log(this.state.PaidList)
+        })
     }
 
     render()
     {
+
+     let ShowSegmentType=this.state.SegmentType.map((result)=>{
+        return(
+            <TouchableOpacity key={result.SegmentId} style={{width:'100%',marginHorizontal:10,marginVertical:2}} onPress={()=>this.setState({SelectedSegmentId:result.SegmentId})}>
+                <RadioBtn Selected={this.state.SelectedSegmentId === result.SegmentId}>
+                    <NormalText style={{marginBottom:0}}>{result.SegmentName}</NormalText>
+                </RadioBtn>
+            </TouchableOpacity>  
+        )
+     })  
+
+     let ShowOwners=this.state.UserOwners.map(result=>{
+         return(
+            <Picker.Item key={result.OwnerId} label={result.OwnerName} value={result.OwnerName}/>
+         )
+     })
+
+     let ShowStrategy=this.state.Strategy.map(result=>{
+         return(
+            <Picker.Item key={result.Id} label={result.Name} value={result.Id}/>
+         )
+     })
+
+     
+     
+     let ShowPaidPrice=this.state.PaidList.map((result,index)=>{
+        return(
+            <View key={index} style={{marginVertical:5,alignItems:'center'}}>
+                <NormalText>{result.PriceType}</NormalText>
+                <View style={{width:'100%',flexDirection:'row',justifyContent:'space-around'}}>
+                    <TextInput keyboardType='numeric' onChangeText={(e)=>this.onPriceChange(index,1,e)} placeholder={"B2B Price"} style={style.PaidTextInputs} />
+                    <TextInput keyboardType='numeric' onChangeText={(e)=>this.onPriceChange(index,2,e)} placeholder={"B2C Price"} style={style.PaidTextInputs} />
+                </View>
+            </View>
+        )
+     })
+
         return(
             <Container style={style.AddPackageContainer}>
+                <ScrollView style={{width:'100%',height:'80%'}}> 
                 <View style={style.StepIndicatorContainer}>
                    <StepIndicator
                     customStyles={customStyles}
@@ -145,7 +266,7 @@ class AddPackage extends React.Component{
                         <View style={{width:'100%',borderWidth:1,borderColor:'#d3d7dc',borderRadius:5}}>
                             <Picker selectedValue={null} onValueChange={(val)=>this.setState({SelectedResearchType:val})} placeholder="Research Types" style={style.CustomPicker}>
                                 <Picker.Item label="Own" value="Own"/>
-                                
+                                {ShowOwners}
                             </Picker>
                         </View>
                     </Card>
@@ -160,30 +281,61 @@ class AddPackage extends React.Component{
                         <TextInput onChangeText={(e)=>this.setState({PackageName:e})} placeholder={"Enter Package Name"} style={style.CustomTextInputs} />
                     </Card>
                 </View>:
+                this.state.AddPackageState === 1 ? 
                 <View style={style.AddPackageContent}>
                     <Card style={style.CustomCard}>
                         <NormalText style={style.HeadingText}>Select Segment Type</NormalText>
                         <View style={style.SegmentContainer}>
-                            <FlatList 
-                                keyExtractor={(item, index) => item.SegmentId.toString()}
-                                data={this.state.SegmentType}
-                                renderItem={this.showSegmentType}
-                                numColumns={1}
-                            />
-                              
+                            {ShowSegmentType}
                         </View>
                     </Card>
-                </View>}
 
-                <View style={{flex:1,flexDirection:'row',alignSelf:'stretch',alignItems:'flex-end',justifyContent:'center'}}>
+                    <Card  style={style.CustomCard}>
+                        <NormalText style={style.HeadingText}>Select Default Duration</NormalText>
+                        <View style={{width:'100%',borderWidth:1,borderColor:'#d3d7dc',borderRadius:5}}>
+                            <Picker selectedValue={null} onValueChange={(val)=>this.setState({SelectedResearchType:val})} placeholder="Research Types" style={style.CustomPicker}>
+                                {ShowStrategy}
+                            </Picker>
+                        </View>
+                    </Card>
+
+                      <Card  style={style.CustomCard}>
+                        <NormalText style={style.HeadingText}>Package Description</NormalText>
+                        <TextInput multiline={true} numberOfLines={4} onChangeText={(e)=>this.setState({PackageName:e})} placeholder={"Enter Pakage Description"} style={style.CustomTextInputs} />
+                    </Card>
+                </View>:
+                <View style={style.AddPackageContent}>
+                    <Card style={style.CustomCard}>
+                        <NormalText style={style.HeadingText}>Package Pricing</NormalText>
+                        <View style={{flexDirection:'row',width:'100%',justifyContent:'space-between',alignItems:'center'}}>
+                            <NormalText style={{fontSize:14,marginBottom:0}}>Is it a Package Paid ?</NormalText>
+                            <Switch
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={ true ? "#f5dd4b" : "#f4f3f4"}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={()=>this.setState({isPaid:!this.state.isPaid})}
+                                value={this.state.isPaid}
+                            />
+                        </View>
+
+                        {this.state.isPaid ? 
+                            <View style={{widht:'100%',marginTop:25}}>
+                               {ShowPaidPrice}
+                            </View>
+                        :null}
+                      
+                    </Card>
+                </View>
+               }
+                 </ScrollView>
+                <View style={{flex:1,flexDirection:'row',alignSelf:'stretch',alignItems:'center',justifyContent:'center',height:50}}>
                     <TouchableOpacity onPress={()=>this.onSubmit()}>
                         <CustomButton style={{width:150}}>
                             <NormalText style={{marginBottom:0,color:'white',fontSize:15}}>Proceed</NormalText>
                         </CustomButton>
                     </TouchableOpacity>
-                    
                 </View>
-                   
+               
             </Container>
         )
     }
@@ -226,6 +378,14 @@ const style=StyleSheet.create({
         borderColor:'#d3d7dc',
         borderWidth:1,
         width:'100%',
+        height:40,
+        textAlign:'center'
+    },
+    PaidTextInputs:{
+        borderRadius:10,
+        borderColor:'#d3d7dc',
+        borderWidth:1,
+        width:'45%',
         height:40,
         textAlign:'center'
     },

@@ -1,13 +1,13 @@
 import React from 'react'
-import { View, StyleSheet,ScrollView } from 'react-native'
+import { View, StyleSheet,ScrollView,AsyncStorage } from 'react-native'
 import { Image } from 'react-native-animatable'
 import {get_user_photo} from '../Utils/api'
 import { connect }from 'react-redux'
 import NormalText from './NormalText'
 import {FontAwesome}  from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import {setRoute} from '../store/Actions/ActionLogin'
-
+import {setRoute,setLogin} from '../store/Actions/ActionLogin'
+import { NavigationActions } from 'react-navigation';
 class CustomDrawer extends React.Component{
     constructor()
     {
@@ -158,7 +158,8 @@ class CustomDrawer extends React.Component{
                     Icon:"sign-out",
                     SubContents:[],
                     Chevron:false,
-                    Expanded:null
+                    Expanded:null,
+                    Key:"LogOut"
                 }
             ]
         }
@@ -184,8 +185,19 @@ class CustomDrawer extends React.Component{
     }
 
     NavigateToRoute=(Route)=>{
-        this.props.onSetRoute(Route)
-        this.props.navigation.navigate(Route)
+        if(Route === "LogOut")
+        {
+            this.props.onSetRoute("")
+            this.props.onSetLogin([])
+            AsyncStorage.clear().then(()=>{
+                this.props.navigation.navigate('PreDB',{},NavigationActions.navigate({routeName:'Login'}))
+            })
+        }
+        else
+        {
+            this.props.onSetRoute(Route)
+            this.props.navigation.navigate(Route)
+        }
     }
 
 
@@ -201,7 +213,14 @@ class CustomDrawer extends React.Component{
                             <FontAwesome name={data.Icon} size={18} color="white" />
                         </View>
                         <View style={{width:'33.33%',alignItems:'flex-start'}}>
-                            <NormalText style={{color:'white',fontSize:14}}>{data.Name}</NormalText>
+                            {
+                                  !data.Chevron ? 
+                                  <TouchableOpacity onPress={()=>data.Key !== undefined ? this.NavigateToRoute(data.Key):null}>
+                                        <NormalText style={{color:'white',fontSize:14}}>{data.Name}</NormalText>
+                                   </TouchableOpacity>:
+                                   <NormalText style={{color:'white',fontSize:14}}>{data.Name}</NormalText>
+                            }
+                          
                         </View>
                         <View style={{width:'33.33%',alignItems:'flex-end',paddingHorizontal:5}}>
                             {

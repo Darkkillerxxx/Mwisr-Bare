@@ -24,7 +24,9 @@ const endpoint_url={
     GetUserPhoto:base_url_Mwisr+"Analyst/GetUserPhoto",
     GetCalls: base_url_wealthyFox+"RTTracker/GetCalls/",
     GetPackages:base_url_wealthyFox + "/AnalystQuery/GetPackageList",
-    GetSubList: base_url_wealthyFox+"MwisrQueries/GetSub/"
+    GetSubList: base_url_wealthyFox+"MwisrQueries/GetSub/",
+    GetUserOwners:base_url_wealthyFox+"Analyst/GetUserOwner",
+    GetStrategy:base_url_wealthyFox+"RTTracker/GetStrategyDuration"
 }
 
 /********* Normal Functions **********/
@@ -583,6 +585,22 @@ export function get_sub_list(userId,listType,IsBase,authHeader) {
   return apiCall(endpoint_url["GetSubList"], "POST", payload, authHeader)
     .then(data => {
       return JSON.parse(data)
+    })
+    .catch(err => err);
+}
+
+export function get_user_owners(authHeader){
+  
+  return apiCall(endpoint_url["GetUserOwners"],"GET",{},authHeader).then(data => {
+    return JSON.parse(data)
+    })
+    .catch(err => err);
+}
+
+export function get_strategy(authHeader){
+  
+  return apiCall(endpoint_url['GetStrategy'],"GET",{},authHeader).then(data => {
+    return JSON.parse(data)
     })
     .catch(err => err);
 }
