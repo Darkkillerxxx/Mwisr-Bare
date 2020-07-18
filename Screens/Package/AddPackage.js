@@ -289,7 +289,7 @@ class AddPackage extends React.Component{
                             {ShowSegmentType}
                         </View>
                     </Card>
-
+{/* {Temp} */}
                     <Card  style={style.CustomCard}>
                         <NormalText style={style.HeadingText}>Select Default Duration</NormalText>
                         <View style={{width:'100%',borderWidth:1,borderColor:'#d3d7dc',borderRadius:5}}>
