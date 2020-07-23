@@ -3,6 +3,7 @@ import { View,Text,AsyncStorage,Picker,StyleSheet,TextInput, TouchableOpacity,Sw
 import { connect }from 'react-redux'
 import {login_call, GetAuthHeader,CheckWhereToGo} from '../../Utils/api.js'
 import {setLogin} from '../../store/Actions/ActionLogin'
+import {Checkbox} from 'react-native-paper'
 import Container from '../../Components/Container'
 import StepIndicator from 'react-native-step-indicator';
 import Card from '../../Components/Card.js';
@@ -12,7 +13,9 @@ import RBContainer from '../../Components/RBContainer.js';
 import CustomButton from '../../Components/Button.js';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import RadioBtn from '../../Components/RadioBtn'
-import {get_user_owners,get_strategy} from '../../Utils/api'
+import {get_user_owners,get_strategy,get_exchanges,upsert_package} from '../../Utils/api'
+import FlashMessage from '../../Components/FlashMessage'
+
 
 const customStyles = {
     stepIndicatorSize: 30,
@@ -46,6 +49,7 @@ class AddPackage extends React.Component{
         this.state={
             AddPackageState:0,
             PackageName:"",
+            PackageDescription:"",
             SelectedOwnerId:"",
             ErrorCode:null,
             SegmentType:[
@@ -78,7 +82,7 @@ class AddPackage extends React.Component{
                     "SegmentName": "CurrencyOptions"
                 }
             ],
-            SelectedSegmentId:1,
+            SelectedSegmentId:null,
             isPaid:false,
             PaidList:[{
                 PriceType: "Per Call",
@@ -132,10 +136,12 @@ class AddPackage extends React.Component{
               }],
               UserOwners:[],
               SelectedUser:null,
-              Strategy:[]
+              Strategy:[],
+              Exchanges:[],
+              SelectedExchanges:[],
+              SelectedStrategyId:1,
+              ShowFlashMessage:false
         }
-      
-
     }
 
     componentDidMount()
@@ -145,7 +151,7 @@ class AddPackage extends React.Component{
             if(result.IsSuccess)
             {
                 this.setState({UserOwners:result.Data},()=>{
-                    console.log(this.state.UserOwners)
+                    // console.log(this.state.UserOwners)
                 })
             }
         })
@@ -157,7 +163,7 @@ class AddPackage extends React.Component{
             }
         })
 
-
+        // console.log(this.props.loginState)
     }
 
     Validation=()=>{
@@ -175,13 +181,21 @@ class AddPackage extends React.Component{
         }
         else if(this.state.AddPackageState === 1)
         {
-           return true 
-        }
-        else if(this.state.AddPackageState === 2)
-        {
-            return true
+           if(this.state.SelectedSegmentId === null)
+           {
+               this.setState({ErrorCode:2})
+               return false
+           }
+           else if(this.state.SelectedExchanges.length === 0)
+           {
+               this.setState({ErrorCode:3})
+               return false
+           }
+           return true
         }
     }
+
+    
 
     onSubmit=()=>{
         if(this.state.AddPackageState !== 2)
@@ -190,6 +204,40 @@ class AddPackage extends React.Component{
             {
                 this.setState({AddPackageState:this.state.AddPackageState + 1})
             }
+        }
+        else
+        {
+            const {UserId,AuthHeader}=this.props.loginState
+            let payload={
+                "ForOwnerId":this.state.SelectedOwnerId === "" ? UserId:this.state.SelectedOwnerId,
+                "PackageId": 0,
+                "PackageName": this.state.PackageName,
+                "PackageDescription": this.state.PackageDescription,
+                "PackagePrices": this.state.PaidList,
+                "IsDefault": false,
+                "IsPublic": false,
+                "IsPaid": this.state.isPaid,
+                "IsInternal": false,
+                "MarketSegmentId": this.state.SelectedSegmentId,
+                "ForExchanges": this.state.SelectedExchanges.toString(),
+                "TipDurationIds": this.state.SelectedStrategyId,
+                "CapitalRequired": 100000,
+                "CallsPerMonth": 150,
+                "MaxSubscription": null,
+                "ShareInWealthyfox": false
+            }
+
+            console.log(payload)
+            upsert_package(AuthHeader,payload).then(result=>{
+                if(result.IsSuccess)
+                {
+                    this.setState({ShowFlashMessage:true},()=>{
+                        setTimeout(()=>{
+                            this.setState({ShowFlashMessage:false})
+                        },3000)
+                    })
+                }
+            })
         }
     }
 
@@ -205,8 +253,44 @@ class AddPackage extends React.Component{
         }
 
         this.setState({PaidList:TempPaidPrice},()=>{
-            console.log(this.state.PaidList)
+            // console.log(this.state.PaidList)
         })
+    }
+
+    FetchExchages=(SegmentId)=>{
+        let TempExhanges=[]
+        get_exchanges(this.props.loginState.AuthHeader,{segmentId:SegmentId}).then(result=>{
+            if(result.IsSuccess)
+            {
+                this.setState({Exchanges:result.Data},()=>{
+                    console.log(this.state.Exchanges)
+                })
+            }
+        })
+    }
+
+    SelectSegment=(SegmentId)=>{
+        this.setState({SelectedSegmentId:SegmentId},()=>{
+            this.FetchExchages(this.state.SelectedSegmentId)
+        })
+    }
+
+    SelectExchange=(Exchange)=>{
+        let TempExchanges=this.state.SelectedExchanges
+        if(!TempExchanges.includes(Exchange))
+        {
+            TempExchanges.push(Exchange)
+            this.setState({SelectedExchanges:TempExchanges})
+            return
+        }
+
+        const index = TempExchanges.indexOf(Exchange);
+        if (index > -1) {
+            TempExchanges.splice(index, 1);
+        }
+
+        this.setState({SelectExchange:TempExchanges})
+        
     }
 
     render()
@@ -214,7 +298,7 @@ class AddPackage extends React.Component{
 
      let ShowSegmentType=this.state.SegmentType.map((result)=>{
         return(
-            <TouchableOpacity key={result.SegmentId} style={{width:'100%',marginHorizontal:10,marginVertical:2}} onPress={()=>this.setState({SelectedSegmentId:result.SegmentId})}>
+            <TouchableOpacity key={result.SegmentId} style={{width:'100%',marginHorizontal:10,marginVertical:2}} onPress={()=>this.SelectSegment(result.SegmentId)}>
                 <RadioBtn Selected={this.state.SelectedSegmentId === result.SegmentId}>
                     <NormalText style={{marginBottom:0}}>{result.SegmentName}</NormalText>
                 </RadioBtn>
@@ -234,6 +318,18 @@ class AddPackage extends React.Component{
          )
      })
 
+     let ShowExchanges=this.state.Exchanges.map(result=>{
+         return(
+            <View key={result.MarketExchangeCode} style={{flexDirection:'row',alignItems:'center',width:'18%',justifyContent:'space-around',marginRight:10}}>
+                <Checkbox
+                    status={this.state.SelectedExchanges.includes(result.MarketExchangeCode) ? "checked":'unchecked'}
+                    onPress={() => this.SelectExchange(result.MarketExchangeCode)}
+                />
+                <NormalText style={{marginBottom:0,marginLeft:5}}>{result.MarketExchangeCode}</NormalText>   
+            </View>
+         )
+     })
+
      
      
      let ShowPaidPrice=this.state.PaidList.map((result,index)=>{
@@ -250,6 +346,14 @@ class AddPackage extends React.Component{
 
         return(
             <Container style={style.AddPackageContainer}>
+                <FlashMessage 
+                 color={"#16d39a"}
+                 Message={"Package Successfully Created !!!"}
+                 Icon={"check"}
+                 IconSize={30}
+                 ShowMessage={this.state.ShowFlashMessage}
+                 />
+
                 <ScrollView style={{width:'100%',height:'80%'}}> 
                 <View style={style.StepIndicatorContainer}>
                    <StepIndicator
@@ -264,8 +368,8 @@ class AddPackage extends React.Component{
                     <Card style={style.CustomCard}>
                         <NormalText style={style.HeadingText}>Select Owner</NormalText>
                         <View style={{width:'100%',borderWidth:1,borderColor:'#d3d7dc',borderRadius:5}}>
-                            <Picker selectedValue={null} onValueChange={(val)=>this.setState({SelectedResearchType:val})} placeholder="Research Types" style={style.CustomPicker}>
-                                <Picker.Item label="Own" value="Own"/>
+                            <Picker selectedValue={null} onValueChange={(val)=>this.setState({SelectedOwnerId:val})} placeholder="Research Types" style={style.CustomPicker}>
+                                <Picker.Item label="Own" value=""/>
                                 {ShowOwners}
                             </Picker>
                         </View>
@@ -284,16 +388,26 @@ class AddPackage extends React.Component{
                 this.state.AddPackageState === 1 ? 
                 <View style={style.AddPackageContent}>
                     <Card style={style.CustomCard}>
-                        <NormalText style={style.HeadingText}>Select Segment Type</NormalText>
+                        <NormalText style={this.state.ErrorCode === 2 ?  style.HeadingTextError:style.HeadingText}>{this.state.ErrorCode === 2 ? "Need To Select One Segment":"Select Segment Type"} </NormalText>
                         <View style={style.SegmentContainer}>
                             {ShowSegmentType}
                         </View>
                     </Card>
-{/* {Temp} */}
+   
+                    {this.state.SelectedSegmentId !== null ? 
+                        <Card style={style.CustomCard}>
+                            <NormalText style={this.state.ErrorCode === 3 ?  style.HeadingTextError:style.HeadingText}>{this.state.ErrorCode === 3 ?  "Need To Select Atleast One Exchange":"Select Exchange"}</NormalText>
+                            <View style={{flexDirection:'row',width:'100%'}}>
+                               {ShowExchanges}
+                            </View>
+                        </Card>
+                    :null}
+                    
+
                     <Card  style={style.CustomCard}>
                         <NormalText style={style.HeadingText}>Select Default Duration</NormalText>
                         <View style={{width:'100%',borderWidth:1,borderColor:'#d3d7dc',borderRadius:5}}>
-                            <Picker selectedValue={null} onValueChange={(val)=>this.setState({SelectedResearchType:val})} placeholder="Research Types" style={style.CustomPicker}>
+                            <Picker selectedValue={this.state.SelectedStrategyId} onValueChange={(val)=>this.setState({SelectedStrategyId:val})}  style={style.CustomPicker}>
                                 {ShowStrategy}
                             </Picker>
                         </View>
@@ -301,7 +415,7 @@ class AddPackage extends React.Component{
 
                       <Card  style={style.CustomCard}>
                         <NormalText style={style.HeadingText}>Package Description</NormalText>
-                        <TextInput multiline={true} numberOfLines={4} onChangeText={(e)=>this.setState({PackageName:e})} placeholder={"Enter Pakage Description"} style={style.CustomTextInputs} />
+                        <TextInput multiline={true} numberOfLines={4} onChangeText={(e)=>this.setState({PackageDescription:e})} placeholder={"Enter Pakage Description"} style={style.CustomTextInputs} />
                     </Card>
                 </View>:
                 <View style={style.AddPackageContent}>
@@ -364,6 +478,10 @@ const style=StyleSheet.create({
     },
     HeadingText:{
         fontSize:16
+    },
+    HeadingTextError:{
+        fontSize:16,
+        color:'red'
     },
     CustomPicker:{
         borderRadius:20,

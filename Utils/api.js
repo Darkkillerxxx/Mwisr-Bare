@@ -26,7 +26,9 @@ const endpoint_url={
     GetPackages:base_url_wealthyFox + "/AnalystQuery/GetPackageList",
     GetSubList: base_url_wealthyFox+"MwisrQueries/GetSub/",
     GetUserOwners:base_url_wealthyFox+"Analyst/GetUserOwner",
-    GetStrategy:base_url_wealthyFox+"RTTracker/GetStrategyDuration"
+    GetStrategy:base_url_wealthyFox+"RTTracker/GetStrategyDuration",
+    GetExchanges:base_url_wealthyFox+"/RTTracker/GetExchanges/",
+    UpsertPackage:base_url_wealthyFox+"Analyst/UpsertPackage"
 }
 
 /********* Normal Functions **********/
@@ -605,3 +607,18 @@ export function get_strategy(authHeader){
     .catch(err => err);
 }
 
+export function get_exchanges(authHeader,payload)
+{
+  return apiCall(endpoint_url['GetExchanges'],"GET",payload,authHeader).then(data => {
+    return JSON.parse(data)
+    })
+    .catch(err => err);
+}
+
+export function upsert_package(authHeader,payload)
+{
+  return apiCall(endpoint_url['UpsertPackage'],"POST",payload,authHeader).then(data => {
+    return JSON.parse(data)
+    })
+    .catch(err => err);
+}
