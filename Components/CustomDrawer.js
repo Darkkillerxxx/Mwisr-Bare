@@ -25,6 +25,18 @@ class CustomDrawer extends React.Component{
                     Expanded:null
                 },
                 {
+                    Name:"Calls",
+                    Icon:"phone",
+                    SubContents:[
+                        {
+                            Key:"ViewCalls",
+                            Name:"View All Calls"
+                        }
+                    ],
+                    Chevron:true,
+                    Expanded:false
+                },
+                {
                     Name:"Packages",
                     Icon:"dropbox",
                     SubContents:[
