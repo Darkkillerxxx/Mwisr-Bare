@@ -34,26 +34,27 @@ class ViewCalls extends React.Component{
     }
 
     getCalls(pageNo,type,firstload = "false",showActive = "true") {
+        console.log(`${pageNo} ${type} ${firstload} ${showActive}`)
         if(firstload)
         {
             this.setState({isLoading:true})
         }
         get_calls(this.props.AuthHeader, {
-          forUserId:"",
+          forUserId:this.props.UserId,
           userTypeId:this.props.STab,
-          showActive: showActive,
-          forOwnerId:"",
-          packageId:"",
-          packageOwnerId:"", // this.props.match.params.forOwnerId,
-          callId: "",
-          exchange: "",
-          symbol: "",
-          assignedToMe:false,
+          showActive:this.props.ShowActive,
+          forOwnerId:this.props.OwnerId,
+          packageId:this.props.PackageId,
+          packageOwnerId:this.props.PackageOwnerId, // this.props.match.params.forOwnerId,
+          callId: this.props.CallId,
+          exchange: this.props.Exchange,
+          symbol: this.props.Symbol,
+          assignedToMe:this.props.AssignedToMe,
           currentPageNo: pageNo,
           PageSize: this.state.PageSize
         }).then(data => {
             this.setState({ManagedCalls:ArrangeCalls(data,this.state.PageSize)},()=>{
-                console.log("Arranged Call",this.state.ManagedCalls)
+                // console.log("Arranged Call",this.state.ManagedCalls)
                 this.setState({isLoading:false})
             })
         });
@@ -61,7 +62,7 @@ class ViewCalls extends React.Component{
 
     ShowCalls=(itemData)=>{
         return(
-            <TouchableOpacity style={{width:'100%'}}>
+            <TouchableOpacity style={{width:'100%',paddingTop:10}}>
                 <View style={styles.CallLegContainer}>
                     <NormalText style={styles.SegmentName}>{itemData.item.Legs[0].StrategyName}</NormalText>
                         {itemData.item.Legs.map((result,index)=>{

@@ -1,35 +1,48 @@
-import React from 'react'
-import { View,AsyncStorage, StyleSheet,TouchableOpacity} from 'react-native';
-import { connect }from 'react-redux'
-import {login_call, GetAuthHeader,get_calls,ArrangeCalls} from '../../Utils/api.js'
-import {setLogin} from '../../store/Actions/ActionLogin'
-import Container from '../../Components/Container.js';
+import React from  'react'
+import { View, StyleSheet,TouchableOpacity,Modal,ToastAndroid } from 'react-native'
+import Container from '../../Components/Container'
 import NormalText from '../../Components/NormalText'
-import ViewCalls from '../../Components/ViewCalls.js'
+import { connect }from 'react-redux'
+import Card from '../../Components/Card'
+import ViewCalls from '../../Components/ViewCalls'
+import { FontAwesome } from '@expo/vector-icons';
+import CallsFilter from '../../Components/CallsFilter'
+import { get_user_owners } from '../../Utils/api'
 
-class Home extends React.Component{
+class ViewCall extends React.Component{
+
     constructor()
     {
         super();
         this.state={
-            SelectedTab:""
+            SelectedTab:"",
+            AssignedToMe:false,
+            Symbol:"",
+            Exchange:"",
+            ShowActive:"",
+            ShowFilterModal:false,
+            UserOwners:[]
         }
     }
 
-    SelectTab=(Tab)=>{
-        this.setState({SelectedTab:Tab})
+    componentDidMount()
+    {
+        get_user_owners(this.props.loginState.AuthHeader).then(result=>{
+            if(result.IsSuccess)
+            {
+                this.setState({UserOwners:result.Data})
+            }
+        })
     }
 
     render()
     {
         return(
-            <Container style={styles.HomeContainer}>
-                <View style={{width:'100%',height:200,borderColor:'black',borderWidth:1,backgroundColor:"#0f2346"}} />
-                
+            <Container style={styles.ViewCallsContainer}>
                 <View style={styles.TabContainer}>
                     <View style={this.state.SelectedTab === "" ? styles.TabsSelected:styles.Tabs}>
                         <TouchableOpacity onPress={()=>this.SelectTab("")}>
-                            <NormalText style={this.state.SelectedTab === "" ? styles.TabsTextSelected:styles.TabsText}>Active Calls</NormalText>
+                            <NormalText style={this.state.SelectedTab === "" ? styles.TabsTextSelected:styles.TabsText}>All Calls</NormalText>
                         </TouchableOpacity>
                     </View>
                     <View style={this.state.SelectedTab === "2" ? styles.TabsSelected:styles.Tabs}>
@@ -48,31 +61,47 @@ class Home extends React.Component{
                         </TouchableOpacity>
                     </View>
                 </View>
-                  <View style={{flex:1,width:'100%',backgroundColor:'#EBECF1',padding:10}}>
-                    <View style={styles.CallsContainer}>
+
+                <View style={{width:'100%',flex:1,padding:10,justifyContent:'flex-end',alignItems:'center'}} >
+   
+                    <View style={{width:'100%',minHeight:100,position:'absolute',elevation:6,alignItems:'flex-end',justifyContent:'center',zIndex:1}}>
+                        <TouchableOpacity onPress={()=>this.setState({ShowFilterModal:true})}>
+                            <View style={{width:60,height:60,borderRadius:100,backgroundColor:'#F0B22A',alignItems:'center',justifyContent:'center'}}>
+                                <FontAwesome name="filter" size={28} color="white" />
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    
+                    <Card style={{width:'100%',height:'100%',zIndex:0}}>
                         <ViewCalls 
                             AuthHeader={this.props.loginState.AuthHeader} 
                             STab={this.state.SelectedTab}
                             UserId=""
                             OwnerId=""
-                            ShowActive={true}
+                            ShowActive={false}
                             PackageId=""
                             PackageOwnerId=""
                             CallId=""
                             Exchange=""
                             Symbol=""
                             AssignedToMe={false}/>
-                    </View>     
-                  </View>  
+                    </Card>
+
+                </View>
+
+                <Modal visible={this.state.ShowFilterModal} animationType="slide" transparent={true}>
+                    <CallsFilter 
+                        UserOwners={this.state.UserOwners}/>
+                </Modal>
             </Container>
         )
     }
 }
 
 const styles=StyleSheet.create({
-    HomeContainer:{
-        flex:1,
-        alignItems:'center',
+    ViewCallsContainer:{
+        backgroundColor:'#EAEBF0',
+        alignItems:'flex-start',
         justifyContent:'flex-start'
     },
     TabContainer:{
@@ -104,12 +133,6 @@ const styles=StyleSheet.create({
         fontSize:11,
         color:'black',
         marginBottom:0
-    },
-    CallsContainer:{
-        flex:1,
-        width:'100%',
-        backgroundColor:'white',
-        elevation:3
     }
 })
 
@@ -125,4 +148,4 @@ const mapDispatchToProps = dispatch =>{
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(Home);
+export default connect(mapStateToProps,mapDispatchToProps)(ViewCall);
