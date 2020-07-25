@@ -21,7 +21,11 @@ class ViewCall extends React.Component{
             Exchange:"",
             ShowActive:"",
             ShowFilterModal:false,
-            UserOwners:[]
+            UserOwners:[],
+            SearchText:"",
+            Exchange:"",
+            CallStatus:"",
+            SelectedOwnerId:""
         }
     }
 
@@ -33,6 +37,20 @@ class ViewCall extends React.Component{
                 this.setState({UserOwners:result.Data})
             }
         })
+    }
+
+    SelectTab=(Tab)=>{
+        this.setState({SelectedTab:Tab})
+    }
+
+    closeFilterModal=(Search,Exchange,CallStatus,OwnerId)=>{
+        this.setState({SelectedOwnerId:OwnerId})
+        this.setState({CallStatus:CallStatus === 0 ? "":CallStatus === 1 ? true:false})
+        this.setState({Exchange:Exchange.toString()})
+        this.setState({SearchText:Search},()=>{
+            this.setState({ShowFilterModal:false})
+        })
+        
     }
 
     render()
@@ -77,13 +95,13 @@ class ViewCall extends React.Component{
                             AuthHeader={this.props.loginState.AuthHeader} 
                             STab={this.state.SelectedTab}
                             UserId=""
-                            OwnerId=""
-                            ShowActive={false}
+                            OwnerId={this.state.SelectedOwnerId}
+                            ShowActive={this.state.CallStatus}
                             PackageId=""
                             PackageOwnerId=""
                             CallId=""
-                            Exchange=""
-                            Symbol=""
+                            Exchange={this.state.Exchange}
+                            Symbol={this.state.SearchText}
                             AssignedToMe={false}/>
                     </Card>
 
@@ -91,7 +109,8 @@ class ViewCall extends React.Component{
 
                 <Modal visible={this.state.ShowFilterModal} animationType="slide" transparent={true}>
                     <CallsFilter 
-                        UserOwners={this.state.UserOwners}/>
+                        UserOwners={this.state.UserOwners}
+                        closeFilter={this.closeFilterModal}/>
                 </Modal>
             </Container>
         )
