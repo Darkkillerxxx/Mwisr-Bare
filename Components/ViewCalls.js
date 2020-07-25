@@ -12,7 +12,9 @@ class ViewCalls extends React.Component{
         this.state={
             ManagedCalls:[],
             isLoading:false,
-            PageSize:5
+            PageSize:5,
+            SearchText:"",
+            Exchanges:""
         }
     }
 
@@ -28,6 +30,11 @@ class ViewCalls extends React.Component{
     componentDidUpdate(prevProps,prevState,Ss)
     {
         if(prevProps.STab !== this.props.STab)
+        {
+            this.getCalls(1,"",true)
+        }
+
+        if(prevProps.Symbol !== this.props.Symbol || prevProps.Exchange !== this.props.Exchange || prevProps.ShowActive !== this.props.ShowActive || prevProps.OwnerId !== this.props.OwnerId )
         {
             this.getCalls(1,"",true)
         }
