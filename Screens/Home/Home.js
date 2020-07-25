@@ -20,6 +20,10 @@ class Home extends React.Component{
         this.setState({SelectedTab:Tab})
     }
 
+    MoveToCallDetails=()=>{
+        this.props.navigation.navigate('CallDetails')
+    }
+
     render()
     {
         return(
@@ -61,7 +65,8 @@ class Home extends React.Component{
                             CallId=""
                             Exchange=""
                             Symbol=""
-                            AssignedToMe={false}/>
+                            AssignedToMe={false}
+                            CallDetails={this.MoveToCallDetails}/>
                     </View>     
                   </View>  
             </Container>
