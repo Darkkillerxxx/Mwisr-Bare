@@ -69,7 +69,7 @@ class ViewCalls extends React.Component{
 
     ShowCalls=(itemData)=>{
         return(
-            <TouchableOpacity style={{width:'100%',paddingTop:10}} onPress={()=>this.props.CallDetails()}>
+            <TouchableOpacity style={{width:'100%',paddingTop:10}} onPress={()=>this.props.CallDetails(itemData.item)}>
                 <View style={styles.CallLegContainer}>
                     <NormalText style={styles.SegmentName}>{itemData.item.Legs[0].StrategyName}</NormalText>
                         {itemData.item.Legs.map((result,index)=>{

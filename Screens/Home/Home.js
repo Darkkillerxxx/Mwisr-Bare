@@ -3,6 +3,7 @@ import { View,AsyncStorage, StyleSheet,TouchableOpacity} from 'react-native';
 import { connect }from 'react-redux'
 import {login_call, GetAuthHeader,get_calls,ArrangeCalls} from '../../Utils/api.js'
 import {setLogin} from '../../store/Actions/ActionLogin'
+import {setMiniDetails} from '../../store/Actions/ActionCallDetails'
 import Container from '../../Components/Container.js';
 import NormalText from '../../Components/NormalText'
 import ViewCalls from '../../Components/ViewCalls.js'
@@ -20,8 +21,14 @@ class Home extends React.Component{
         this.setState({SelectedTab:Tab})
     }
 
-    MoveToCallDetails=()=>{
-        this.props.navigation.navigate('CallDetails')
+    MoveToCallDetails=(MiniCallDetails)=>{
+        let TempMiniCD=[]
+        TempMiniCD.push(MiniCallDetails)
+        this.props.onSetMiniCD(MiniCallDetails)
+        
+        this.props.navigation.navigate('CallDetails',{
+            MiniDetails:MiniCallDetails
+        })
     }
 
     render()
@@ -126,7 +133,8 @@ const mapStateToProps= state =>{
 
 const mapDispatchToProps = dispatch =>{
     return{
-        onSetLogin:(response)=>dispatch(setLogin(response))
+        onSetLogin:(response)=>dispatch(setLogin(response)),
+        onSetMiniCD:(response)=>dispatch(setMiniDetails(response))
     }
 }
 

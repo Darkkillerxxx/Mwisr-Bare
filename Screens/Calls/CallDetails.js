@@ -1,19 +1,24 @@
 import React from 'react'
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity,ActivityIndicator } from 'react-native';
 import Container from '../../Components/Container';
 import NormalText from '../../Components/NormalText';
 import BoldText from '../../Components/BoldText'
-import { ScrollView } from 'react-native-gesture-handler';
+import { connect }from 'react-redux'
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import { FontAwesome } from '@expo/vector-icons';
 import CollapsibleCard from '../../Components/CollapsibleCard'
 import Card from '../../Components/Card'
+import {NavigationEvents} from 'react-navigation';
+import {get_call_details,formatDate} from '../../Utils/api'
 
 class CallDetails extends React.Component{
-    constructor()
+    constructor(props)
     {
         super();
         this.state={
-
+            MaxDetails:[],
+            isLoading:false,
+            SelectedTab:0
         }
     }
 
@@ -21,71 +26,112 @@ class CallDetails extends React.Component{
         this.refs.Company.CollapseCard()
     }
 
+    getCallDetails=(pId,cId)=>{
+        console.log(this.props.MiniCDState.Legs[this.state.SelectedTab])
+        this.setState({isLoading:true})
+        let payload={
+            packageId:pId,
+            callId:cId
+        }
+
+        get_call_details(this.props.loginState.AuthHeader,payload).then(result=>{
+            console.log("Getting",result)
+            if(result.IsSuccess)
+            {
+               this.setState({MaxDetails:result.Data},()=>{
+                   if(this.state.MaxDetails.length > 0)
+                   {
+                       this.setState({isLoading:false})
+                   } 
+               })
+            }
+        })   
+    }
+
+    GetAddedDateTime=(DateTime)=>{
+        let Temp=DateTime.split(' ')
+        return `${formatDate(DateTime)} ${Temp[1]} ${Temp[2]} `
+    }
+
     render()
     {
+       const {PackageId,CallId,MarketSegmentId,MarketSegmentName,ProfitPerInvestment,ExpiryDate,FutOption,CallStatus,StrikePrice,TipStartDate,CMPMin,CMPMax,CMPName}=this.props.MiniCDState.Legs[this.state.SelectedTab]
         return(
           <Container style={styles.CallDetailsContainer}>
-              
+              <NavigationEvents onDidFocus={() => this.getCallDetails(PackageId,CallId) } />
               <View style={styles.CallDetailsContentContainer}>
                 <ScrollView style={styles.CallDetailsScrollView}>
                     <View style={styles.ContentTopContainer} >
+                        
+                        {!this.state.isLoading && this.state.MaxDetails.length > 0 ?
                         <View style={styles.ContentTop}>
                             <View style={styles.ContentTopMiddle}>
                                 <View style={styles.ContentTopMiddleLeftContainer}>
-                                    <View style={styles.BuySell}>
-                                        <NormalText style={{marginBottom:0,fontSize:15,color:'white'}}>BUY</NormalText>
+                                    <View style={this.state.MaxDetails[0].CallType === 1 ? styles.Buy:styles.Sell}>
+                                        <NormalText style={{marginBottom:0,fontSize:15,color:'white'}}>{this.state.MaxDetails[0].CallType === 1 ? "BUY":"SELL"}</NormalText>
                                     </View>
                                     <View style={{height:50,justifyContent:'space-evenly'}}>
-                                        <NormalText style={{marginBottom:0,fontSize:12,color:'white'}}>INFY 25 FEB 2016</NormalText>
-                                        <NormalText style={{marginBottom:0,fontSize:12,color:'white'}}>24 JAN 2016 09.30</NormalText>
+                                        <NormalText style={{marginBottom:0,fontSize:12,color:'white'}}>{`${this.state.MaxDetails[0].Symbol} ${MarketSegmentId !== "1" ? formatDate(ExpiryDate):""} ${MarketSegmentId === "9" || MarketSegmentId === "11" || MarketSegmentId === "12" ? `${FutOption} ${StrikePrice}`:""} `  }</NormalText>
+                                        <NormalText style={{marginBottom:0,fontSize:12,color:'white'}}>{this.GetAddedDateTime(TipStartDate)}</NormalText>
                                     </View>
                                 </View>
                                 <View style={styles.ContentTopMiddleRightContainer}>
                                     <View style={{height:50,justifyContent:'space-evenly',alignItems:'flex-end'}}>
                                         <NormalText style={{marginBottom:0,fontSize:12,color:'white'}}>Profit</NormalText>
                                         <View style={{flexDirection:'row',width:'100%'}}>
-                                            <FontAwesome name="arrow-up" size={14} color="white" />
-                                            <NormalText style={{marginBottom:0,fontSize:12,color:'white',marginLeft:5}}>2500 ₹</NormalText>
+                                            {ProfitPerInvestment !== 0 ?   <FontAwesome name="arrow-up" size={14} color={`${ProfitPerInvestment > 0 ? "green":ProfitPerInvestment < 0 ? "red":"white" }`} />:null }
+                                            <NormalText style={{marginBottom:0,fontSize:12,color:`${ProfitPerInvestment > 0 ? "green":ProfitPerInvestment < 0 ? "red":"white" }`,marginLeft:5}}>{ProfitPerInvestment} ₹</NormalText>
                                         </View>                    
                                     </View>
                                 </View>
                                
                             </View>
-                        </View>
+                        </View>:null}
+                        
+                        {!this.state.isLoading && this.state.MaxDetails.length > 0 ?
                         <View style={styles.ContentBottomContainer}>
                             <View style={styles.ContentBottomLeft}>
-                                <NormalText style={styles.ContentBottomHeadingText}>Futures</NormalText>
-                                <NormalText style={styles.ContentBottomNormalText}>Status Active</NormalText>
+                                <NormalText style={styles.ContentBottomHeadingText}>{MarketSegmentName}</NormalText>
+                                <NormalText style={styles.ContentBottomNormalText}>Status {CallStatus === "A" ? "Active":"In-Active"}</NormalText>
                             </View>
                             <View style={styles.ContentBottomRight}>
                                 <NormalText style={styles.ContentBottomHeadingText}>Accuracy</NormalText>
-                                <NormalText style={styles.ContentBottomNormalText}>87 %</NormalText>
+                                <NormalText style={styles.ContentBottomNormalText}>{this.state.MaxDetails[0].Accuracy} %</NormalText>
                             </View>
+                        </View>:null}
+
+                        {this.state.isLoading?
+                        <View style={{width:'100%',height:'100%',alignItems:'center',justifyContent:'center'}}>
+                            <ActivityIndicator size="large" color="white"/>
                         </View>
+                        :null}
                     </View>
 
+                    {this.state.MaxDetails.length > 0 && !this.state.isLoading ? 
                     <View style={styles.ContentBottom}>
                         <CollapsibleCard style={styles.CustomCard} Heading="Company">
                             <View style={styles.CustomCardCompanyContainer}>
                                 <View style={styles.CustomCardCompanyLeft}>
-                                    <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>INFY 25 FEB 2016</NormalText>
+                                    <NormalText style={{fontSize:15,color:'black',marginBottom:0}}>{`${this.state.MaxDetails[0].Symbol} ${MarketSegmentId !== "1" ? formatDate(ExpiryDate):""}`}</NormalText>
+                                    {MarketSegmentId === "9" || MarketSegmentId === "11" || MarketSegmentId === "12" ? 
+                                    <NormalText style={{fontSize:15,color:'black',marginBottom:0}}>{`${FutOption} ${StrikePrice}`}</NormalText>:null}
                                 </View>
                                 <View style={styles.CustomCardCompanyRight}>
-                                    <NormalText style={{fontSize:15,marginBottom:0}}>24 Mar 2016 9.30</NormalText>
+                                    <NormalText style={{fontSize:15,marginBottom:0}}>{this.GetAddedDateTime(TipStartDate)}</NormalText>
                                 </View>
                             </View>                            
                         </CollapsibleCard>
 
-                        <CollapsibleCard style={styles.CustomCard} Heading="CMP">
+                        <CollapsibleCard style={styles.CustomCard} Heading={CMPName}>
                             <View style={styles.CustomCardCompanyContainer}>
                                 <View style={styles.CustomCardCompanyLeft}>
                                     <BoldText style={{fontSize:15,color:'black',marginBottom:0}}>Trigger Min</BoldText>
-                                    <NormalText style={{fontSize:17,marginBottom:0,marginTop:5}}>1150</NormalText>
+                                    <NormalText style={{fontSize:17,marginBottom:0,marginTop:5}}>{CMPMin}</NormalText>
                                     <NormalText style={{fontSize:17,color:'black',marginBottom:0,marginTop:15}}>Triggers at 1500</NormalText>
                                 </View>
                                 <View style={{...styles.CustomCardCompanyRight,...{alignItems:'flex-start'}}}>
                                     <BoldText style={{fontSize:15,marginBottom:0,color:'black'}}>Trigger Max</BoldText>
-                                    <NormalText style={{fontSize:17,marginBottom:0,marginTop:5}}>2150</NormalText>
+                                    <NormalText style={{fontSize:17,marginBottom:0,marginTop:5}}>{CMPMax}</NormalText>
                                     <NormalText style={{fontSize:17,color:'black',marginBottom:0,marginTop:15}}>Activates at 9.30</NormalText>
                                 </View>
                             </View>                            
@@ -254,7 +300,7 @@ class CallDetails extends React.Component{
                                     <NormalText style={{fontSize:17,color:'black',marginBottom:0,marginTop:15}}>Accuracy</NormalText>
                                 </View>
                                 <View style={{...styles.CustomCardCompanyRight,...{alignItems:'flex-end'}}}>
-                                    <NormalText style={{fontSize:17,color:'black',marginBottom:0,marginTop:15}}>90%</NormalText>
+                                    <NormalText style={{fontSize:17,color:'black',marginBottom:0,marginTop:15}}>{this.state.MaxDetails[0].Accuracy}%</NormalText>
                                 </View>
                             </View>    
                             <View style={styles.CustomCardCompanyContainer}>
@@ -262,7 +308,7 @@ class CallDetails extends React.Component{
                                     <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>ROI</NormalText>
                                 </View>
                                 <View style={{...styles.CustomCardCompanyRight,...{alignItems:'flex-end'}}}>
-                                    <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>55%</NormalText>
+                                    <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>{this.state.MaxDetails[0].ROI} %</NormalText>
                                 </View>
                             </View>          
                             <View style={styles.CustomCardCompanyContainer}>
@@ -270,7 +316,7 @@ class CallDetails extends React.Component{
                                     <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>Profit</NormalText>
                                 </View>
                                 <View style={{...styles.CustomCardCompanyRight,...{alignItems:'flex-end'}}}>
-                                    <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>45000 ₹</NormalText>
+                                    <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>{ProfitPerInvestment} ₹</NormalText>
                                 </View>
                             </View>          
                             <View style={styles.CustomCardCompanyContainer}>
@@ -278,11 +324,11 @@ class CallDetails extends React.Component{
                                     <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>Investment</NormalText>
                                 </View>
                                 <View style={{...styles.CustomCardCompanyRight,...{alignItems:'flex-end'}}}>
-                                    <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>1000000 ₹</NormalText>
+                                    <NormalText style={{fontSize:17,color:'black',marginBottom:0}}>{this.state.MaxDetails[0].InvestmentSizeLot !== null ? this.state.MaxDetails[0].InvestmentSizeLot : this.state.MaxDetails[0].InvestmentSizeEq } {`${this.state.MaxDetails[0].InvestmentSizeLot !== null ? 'Lot':`${'₹'}`}`}</NormalText>
                                 </View>
                             </View>                            
                         </CollapsibleCard>
-                    </View>
+                    </View>:null}
                 </ScrollView>
               </View>
               
@@ -354,13 +400,23 @@ const styles=StyleSheet.create({
         width:'65%',
         height:'100%',
         flexDirection:'row',
-        justifyContent:'space-evenly',
+        justifyContent:'center',
         alignItems:'center'
     },
-    BuySell:{
+    Buy:{
         width:50,
         height:50,
         backgroundColor:'#378E61',
+        marginRight:10,
+        borderRadius:5,
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    Sell:{
+        width:50,
+        height:50,
+        backgroundColor:'#ff6961',
+        marginRight:10,
         borderRadius:5,
         alignItems:'center',
         justifyContent:'center'
@@ -495,4 +551,18 @@ const styles=StyleSheet.create({
 })
 
 
-export default CallDetails
+const mapStateToProps= state =>{
+    return{
+      MiniCDState:state.CallDetails.MiniCallDetails,
+      MaxCDState:state.CallDetails.MaxCallDetails,
+      loginState:state.login.login
+    }
+}
+
+const mapDispatchToProps = dispatch =>{
+    return{
+        onSetLogin:(response)=>dispatch(setLogin(response))
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(CallDetails);

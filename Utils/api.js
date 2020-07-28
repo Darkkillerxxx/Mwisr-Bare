@@ -28,7 +28,8 @@ const endpoint_url={
     GetUserOwners:base_url_wealthyFox+"Analyst/GetUserOwner",
     GetStrategy:base_url_wealthyFox+"RTTracker/GetStrategyDuration",
     GetExchanges:base_url_wealthyFox+"/RTTracker/GetExchanges/",
-    UpsertPackage:base_url_wealthyFox+"Analyst/UpsertPackage"
+    UpsertPackage:base_url_wealthyFox+"Analyst/UpsertPackage",
+    GetCallDetails:base_url_wealthyFox+"AnalystQuery/GetCallDetail"
 }
 
 /********* Normal Functions **********/
@@ -618,6 +619,14 @@ export function get_exchanges(authHeader,payload)
 export function upsert_package(authHeader,payload)
 {
   return apiCall(endpoint_url['UpsertPackage'],"POST",payload,authHeader).then(data => {
+    return JSON.parse(data)
+    })
+    .catch(err => err);
+}
+
+export function get_call_details(authHeader,payload)
+{
+  return apiCall(endpoint_url['GetCallDetails'],"GET",payload,authHeader).then(data => {
     return JSON.parse(data)
     })
     .catch(err => err);
