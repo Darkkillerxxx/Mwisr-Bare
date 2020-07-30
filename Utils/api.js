@@ -29,7 +29,8 @@ const endpoint_url={
     GetStrategy:base_url_wealthyFox+"RTTracker/GetStrategyDuration",
     GetExchanges:base_url_wealthyFox+"/RTTracker/GetExchanges/",
     UpsertPackage:base_url_wealthyFox+"Analyst/UpsertPackage",
-    GetCallDetails:base_url_wealthyFox+"AnalystQuery/GetCallDetail"
+    GetCallDetails:base_url_wealthyFox+"AnalystQuery/GetCallDetail",
+    GetResearchReports:base_url_wealthyFox+"ResearchReport/GetResearchReport"
 }
 
 /********* Normal Functions **********/
@@ -91,6 +92,13 @@ export function formatDate(date){
 
   return `${dateArray[1]}-${months[dateArray[0]]}-${dateArray[2]}`
 
+}
+
+export function reportDate(date)
+{
+  let dateArray=date.split('-')
+  let months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  return `${dateArray[2]}-${months[parseInt(dateArray[1])]}-${dateArray[0]}`
 }
 
 export let getPackageBackColor=(segment)=>{
@@ -627,6 +635,14 @@ export function upsert_package(authHeader,payload)
 export function get_call_details(authHeader,payload)
 {
   return apiCall(endpoint_url['GetCallDetails'],"GET",payload,authHeader).then(data => {
+    return JSON.parse(data)
+    })
+    .catch(err => err);
+}
+
+export function get_research_reports(authHeader,payload)
+{
+  return apiCall(endpoint_url['GetResearchReports'],"GET",payload,authHeader).then(data => {
     return JSON.parse(data)
     })
     .catch(err => err);

@@ -19,6 +19,7 @@ import Partner from '../Screens/Users/Partner'
 import ViewCall from '../Screens/Calls/ViewCalls'
 import CallDetails from '../Screens/Calls/CallDetails'
 import { sub } from 'react-native-reanimated';
+import ViewReports from '../Screens/Reports/ViewReports'
 
 const Drawer=createDrawerNavigator({
     Home:createBottomTabNavigator({
@@ -77,6 +78,9 @@ const Drawer=createDrawerNavigator({
     },
     CallDetails:{
         screen:CallDetails
+    },
+    ViewReports:{
+        screen:ViewReports
     }
 },{
     contentComponent:CustomDrawer,
