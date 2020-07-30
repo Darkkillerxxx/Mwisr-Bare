@@ -83,6 +83,10 @@ class CustomDrawer extends React.Component{
                     SubContents:[
                         {
                             Name:"Add Report"
+                        },
+                        {
+                            Key:"ViewReports",
+                            Name:"View Report"
                         }
                     ],
                     Chevron:true,
