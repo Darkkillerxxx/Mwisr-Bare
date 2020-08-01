@@ -22,15 +22,18 @@ class CustomDrawer extends React.Component{
                     Icon:"user",
                     SubContents:[],
                     Chevron:false,
-                    Expanded:null
+                    Expanded:null,
+                    isVisible:true
                 },
                 {
                     Name:"Calls",
                     Icon:"phone",
+                    isVisible:true,
                     SubContents:[
                         {
                             Key:"ViewCalls",
-                            Name:"View All Calls"
+                            Name:"View All Calls",
+                            isVisible:true
                         }
                     ],
                     Chevron:true,
@@ -39,13 +42,17 @@ class CustomDrawer extends React.Component{
                 {
                     Name:"Packages",
                     Icon:"dropbox",
+                    isVisible:true,
                     SubContents:[
                         {
                             Key:'ViewPackage',
-                            Name:"View Packages"
+                            Name:"View Packages",
+                            isVisible:true
                         },
                         {
-                            Name:"Assign Packages"
+                            Key:"AssignPackage",
+                            Name:"Assign Packages",
+                            isVisible:true
                         }
                     ],
                     Chevron:true,
@@ -54,24 +61,34 @@ class CustomDrawer extends React.Component{
                 {
                     Name:"Users",
                     Icon:"users",
+                    isVisible:true,
                     SubContents:[
                         {
+                            Name:"Owner List",
+                            isVisible:true
+                        },
+                        {
                             Key:"Sub",
-                            Name:"Sub-Broker List"
+                            Name:"Sub-Broker List",
+                            isVisible:true
                         },
                         {
                             Key:"Analyst",
-                            Name:"Analyst List"
+                            Name:"Analyst List",
+                            isVisible:true
                         },
                         {
                             Key:"Partner",
-                            Name:"Partner List"
+                            Name:"Partner List",
+                            isVisible:true
                         },
                         {
-                            Name:"Customer List"
+                            Name:"Customer List",
+                            isVisible:true
                         },
                         {
-                            Name:"Add User"
+                            Name:"Add User",
+                            isVisible:true
                         }
                     ],
                     Chevron:true,
@@ -80,13 +97,16 @@ class CustomDrawer extends React.Component{
                 {
                     Name:"Reports",
                     Icon:"file-text",
+                    isVisible:true,
                     SubContents:[
                         {
-                            Name:"Add Report"
+                            Name:"Add Report",
+                            isVisible:true
                         },
                         {
                             Key:"ViewReports",
-                            Name:"View Report"
+                            Name:"View Report",
+                            isVisible:true
                         }
                     ],
                     Chevron:true,
@@ -95,12 +115,15 @@ class CustomDrawer extends React.Component{
                 {
                     Name:"Telegram",
                     Icon:"paper-plane",
+                    isVisible:true,
                     SubContents:[
                         {
-                            Name:"Configure Telegram"
+                            Name:"Configure Telegram",
+                            isVisible:true
                         },
                         {
-                            Name:"Package Channel"
+                            Name:"Package Channel",
+                            isVisible:true
                         }
                     ],
                     Chevron:true,
@@ -109,12 +132,15 @@ class CustomDrawer extends React.Component{
                 {
                     Name:"Message",
                     Icon:"mobile-phone",
+                    isVisible:true,
                     SubContents:[
                         {
-                            Name:"Send Message"
+                            Name:"Send Message",
+                            isVisible:true
                         },
                         {
-                            Name:"Received Message"
+                            Name:"Received Message",
+                            isVisible:true
                         }
                     ],
                     Chevron:true,
@@ -123,12 +149,15 @@ class CustomDrawer extends React.Component{
                 {
                     Name:"Subscription",
                     Icon:"gift",
+                    isVisible:true,
                     SubContents:[
                         {
-                            Name:"Buy Subscription"
+                            Name:"Buy Subscription",
+                            isVisible:true
                         },
                         {
-                            Name:"Add-Ons"
+                            Name:"Add-Ons",
+                            isVisible:true
                         }
                     ],
                     Chevron:true,
@@ -137,12 +166,15 @@ class CustomDrawer extends React.Component{
                 {
                     Name:"Settings",
                     Icon:"wrench",
+                    isVisible:true,
                     SubContents:[
                         {
-                            Name:"Notifications"
+                            Name:"Notifications",
+                            isVisible:true
                         },
                         {
-                            Name:"Brokerage Account"
+                            Name:"Brokerage Account",
+                            isVisible:true
                         }
                     ],
                     Chevron:true,
@@ -153,21 +185,24 @@ class CustomDrawer extends React.Component{
                     Icon:"book",
                     SubContents:[],
                     Chevron:false,
-                    Expanded:null
+                    Expanded:null,
+                    isVisible:true
                 },
                 {
                     Name:"Positional Book",
                     Icon:"book",
                     SubContents:[],
                     Chevron:false,
-                    Expanded:null
+                    Expanded:null,
+                    isVisible:true
                 },
                 {
                     Name:"Trade Book",
                     Icon:"book",
                     SubContents:[],
                     Chevron:false,
-                    Expanded:null
+                    Expanded:null,
+                    isVisible:true
                 },
                 {
                     Name:"Logout",
@@ -175,7 +210,8 @@ class CustomDrawer extends React.Component{
                     SubContents:[],
                     Chevron:false,
                     Expanded:null,
-                    Key:"LogOut"
+                    Key:"LogOut",
+                    isVisible:true
                 }
             ]
         }
@@ -192,6 +228,13 @@ class CustomDrawer extends React.Component{
                 this.setState({UriImage:result.Data.URL})
             }
         })
+
+        if(!this.props.loginState.isOwner)
+        {
+            let TempMenuContents=this.state.MenuContents
+            TempMenuContents[3].SubContents[0].isVisible=false
+            this.setState({MenuContent:TempMenuContents})
+        }
     }
 
     ExpandMinimizeMenu=(index)=>{
@@ -223,6 +266,7 @@ class CustomDrawer extends React.Component{
 
         let MenuContent=this.state.MenuContents.map((data,index)=>{
             return(
+                data.isVisible ?
                 <View key={index} >
                     <View style={{width:'100%',flexDirection:'row',justifyContent:'space-between',marginVertical:5}}>
                         <View style={{width:'33.33%',alignItems:'flex-start',paddingHorizontal:10}}>
@@ -251,6 +295,7 @@ class CustomDrawer extends React.Component{
                     {data.Expanded ? 
                         data.SubContents.map((data,index)=>{
                             return(
+                                data.isVisible ? 
                                 <View key={index} style={{width:'80%',alignItems:'flex-end'}}>
                                     <TouchableOpacity onPress={()=>{
                                         data.Key !== undefined ? 
@@ -259,13 +304,13 @@ class CustomDrawer extends React.Component{
                                         }}>
                                         <NormalText style={{color:`${this.props.routeState === data.Key ? "yellow":"white"}`,fontSize:14,textAlign:'left'}}>{data.Name}</NormalText>
                                     </TouchableOpacity>
-                                </View>
+                                </View>:null
                             )
                         })
                         :null    
                     }
                     
-                </View>
+                </View>:null
                 
             )
         })

@@ -21,6 +21,16 @@ class ViewReports extends React.Component{
 
     componentDidMount()
     {
+       this.FetchReports("")
+    }
+    
+    ShowReports=(itemData)=>{
+        return(
+            <ReportsCard report={itemData.item}/>
+        )
+    }
+
+    FetchReports=(SearchText)=>{
         const {AuthHeader,UserId}=this.props.loginState
         
         let payload={
@@ -35,7 +45,7 @@ class ViewReports extends React.Component{
             ResearchHousIds:"",
             AuthorIds:"",
             ReportTypeIds:"",
-            Symbol:""
+            Symbol:SearchText
         }
         this.setState({isLoading:true})
         get_research_reports(AuthHeader,payload).then(result=>{
@@ -44,19 +54,14 @@ class ViewReports extends React.Component{
             {
                this.setState({Reports:result.Data},()=>{
                    this.setState({isLoading:false})
+                   this.setState({ShowFilterModal:false})
                })
             }
         })
     }
-    
-    ShowReports=(itemData)=>{
-        return(
-            <ReportsCard report={itemData.item}/>
-        )
-    }
 
-    CloseFilter=()=>{
-        
+    CloseFilter=(SearchText)=>{
+        this.FetchReports(SearchText)
     }
 
     render()
@@ -85,7 +90,8 @@ class ViewReports extends React.Component{
                   </View>
                 }
                 <Modal visible={this.state.ShowFilterModal} animationType="slide" transparent={true}>
-                    <ReportFilter />
+                    <ReportFilter
+                    closeFilter={this.CloseFilter} />
                 </Modal>
             </Container>
         )
@@ -94,7 +100,7 @@ class ViewReports extends React.Component{
 
 const styles=StyleSheet.create({
     ViewReportsContainer:{
-        backgroundColor:'#CBCFD6',
+        backgroundColor:'#EBECF1',
         justifyContent:'flex-end',
         alignItems:'center'
     },
